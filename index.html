@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Delivery Control Center</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{
+  --font-sans:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono','Consolas',monospace;
+  --bg-primary:#f0f2f5;--bg-surface:#ffffff;--bg-surface-2:#f8f9fb;
+  --bg-surface-3:#eef0f4;--bg-sidebar:#1a2332;--bg-sidebar-hover:#243040;
+  --bg-sidebar-active:#0052cc;--bg-header:#ffffff;
+  --text-primary:#172b4d;--text-secondary:#5e6c84;--text-muted:#97a0af;
+  --text-inverse:#ffffff;--text-sidebar:#b3c0d1;--text-sidebar-active:#ffffff;
+  --border-color:#dfe1e6;--border-color-2:#c1c7d0;
+  --accent:#0052cc;--accent-light:#e8f0fe;--accent-hover:#0041a3;
+  --green:#00875a;--green-bg:#e3fcef;--amber:#ff8b00;--amber-bg:#fffae6;
+  --red:#de350b;--red-bg:#ffebe6;--blue:#0052cc;--blue-bg:#e8f0fe;
+  --purple:#6554c0;--purple-bg:#eae6ff;--teal:#00a3bf;--teal-bg:#e6fcff;
+  --shadow-sm:0 1px 3px rgba(9,30,66,.12);--shadow-md:0 3px 8px rgba(9,30,66,.16);
+  --shadow-lg:0 8px 24px rgba(9,30,66,.18);
+  --radius-sm:3px;--radius-md:6px;--radius-lg:10px;
+  --header-height:56px;--sidebar-width:230px;
+}
+[data-theme="dark"]{
+  --bg-primary:#0d1117;--bg-surface:#161b22;--bg-surface-2:#1c2128;
+  --bg-surface-3:#21262d;--bg-sidebar:#0d1117;--bg-sidebar-hover:#1c2128;
+  --bg-sidebar-active:#1f6feb;--bg-header:#161b22;
+  --text-primary:#e6edf3;--text-secondary:#8b949e;--text-muted:#484f58;
+  --text-sidebar:#8b949e;--text-sidebar-active:#ffffff;
+  --border-color:#30363d;--border-color-2:#21262d;
+  --accent:#388bfd;--accent-light:#1f3a5f;--accent-hover:#58a6ff;
+  --green:#3fb950;--green-bg:#122518;--amber:#d29922;--amber-bg:#2d1f0e;
+  --red:#f85149;--red-bg:#2d0f0e;--blue:#388bfd;--blue-bg:#0f1f3a;
+  --purple:#bc8cff;--purple-bg:#1e0a3c;--teal:#39d0d8;--teal-bg:#0a2a2e;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.4);--shadow-md:0 3px 8px rgba(0,0,0,.5);
+  --shadow-lg:0 8px 24px rgba(0,0,0,.6);
+}
+[data-theme="slate"]{
+  --bg-primary:#e2e5ea;--bg-surface:#f0f2f5;--bg-surface-2:#e4e6ea;
+  --bg-surface-3:#d8dbe0;--bg-sidebar:#2c3547;--bg-sidebar-hover:#37435a;
+  --bg-sidebar-active:#1967d2;--bg-header:#f0f2f5;
+  --text-primary:#1d2330;--text-secondary:#4a5568;--text-muted:#8a9ab5;
+  --text-sidebar:#9baacb;--text-sidebar-active:#fff;
+  --border-color:#c9cdd5;--border-color-2:#b5bac4;
+  --accent:#1967d2;--accent-light:#e8f0fe;--accent-hover:#1558b0;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;font-size:14px}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-primary);height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+#app{display:flex;flex-direction:column;height:100vh}
+/* HEADER */
+#hdr{height:var(--header-height);background:var(--bg-header);border-bottom:1px solid var(--border-color);display:flex;align-items:center;padding:0 12px;gap:10px;z-index:100;flex-shrink:0;box-shadow:var(--shadow-sm);min-width:0}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--accent);white-space:nowrap;width:310px;min-width:310px;max-width:310px;overflow:hidden}
+.logo-box{width:30px;height:30px;background:var(--accent);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;font-family:var(--font-mono);flex-shrink:0}
+.logo-txt{line-height:1.1;min-width:0;overflow:hidden;text-overflow:ellipsis}.logo-txt small{display:block;font-size:9px;font-weight:400;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;overflow:hidden;text-overflow:ellipsis}
+.hdiv{width:1px;height:26px;background:var(--border-color)}
+#projSel{height:32px;border:1px solid var(--border-color-2);border-radius:var(--radius-sm);background:var(--bg-surface-2);color:var(--text-primary);font-family:var(--font-sans);font-size:12px;padding:0 28px 0 10px;width:240px;max-width:28vw;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%235e6c84'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;flex-shrink:1}
+#projSel:focus{outline:2px solid var(--accent);outline-offset:1px}
+.hsp{flex:1}
+.hacts{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.bico{width:30px;height:30px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s}
+.bico:hover{background:var(--bg-surface-3);color:var(--text-primary)}
+#curUser{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);padding:4px 10px;background:var(--bg-surface-2);border:1px solid var(--border-color);border-radius:var(--radius-sm);cursor:pointer;height:30px}
+.uavatar{width:22px;height:22px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:600;flex-shrink:0}
+/* LAYOUT */
+#mlayout{display:flex;flex:1;overflow:hidden}
+/* SIDEBAR */
+#sidebar{width:var(--sidebar-width);background:var(--bg-sidebar);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;overflow-x:hidden;z-index:50}
+#sidebar::-webkit-scrollbar{width:3px}
+#sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.snav-sec{padding:8px 0 2px}
+.snav-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:rgba(179,192,209,.45);padding:4px 14px}
+.nitem{display:flex;align-items:center;gap:8px;padding:7px 14px;color:var(--text-sidebar);font-size:12px;font-weight:400;cursor:pointer;transition:all .12s;position:relative;white-space:nowrap}
+.nitem:hover{background:var(--bg-sidebar-hover);color:#d4dde8}
+.nitem.active{background:var(--bg-sidebar-active);color:var(--text-sidebar-active);font-weight:500}
+.nitem.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:rgba(255,255,255,.5)}
+.nico{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.nbadge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:600;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px}
+/* CONTENT */
+#content{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg-primary);display:flex;flex-direction:column}
+#content::-webkit-scrollbar{width:5px}
+#content::-webkit-scrollbar-thumb{background:var(--border-color-2);border-radius:3px}
+.pview{display:none;flex-direction:column;flex:1;min-height:0}
+.pview.active{display:flex}
+/* PAGE HEADER */
+.phdr{background:var(--bg-surface);border-bottom:1px solid var(--border-color);padding:12px 22px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ptitle{font-size:17px;font-weight:700;color:var(--text-primary)}
+.psub{font-size:11px;color:var(--text-muted);margin-top:1px}
+.pacts{margin-left:auto;display:flex;gap:6px;align-items:center}
+.pbody{padding:18px 22px;flex:1;overflow-y:auto}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:var(--radius-sm);font-family:var(--font-sans);font-size:12px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .12s;white-space:nowrap}
+.btn-p{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-p:hover{background:var(--accent-hover)}
+.btn-s{background:var(--bg-surface);color:var(--text-primary);border-color:var(--border-color-2)}
+.btn-s:hover{background:var(--bg-surface-3)}
+.btn-d{background:var(--red);color:#fff;border-color:var(--red)}
+.btn-d:hover{background:#b52b08}
+.btn-ok{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-g{background:transparent;color:var(--text-secondary);border-color:transparent}
+.btn-g:hover{background:var(--bg-surface-3);color:var(--text-primary)}
+.btn-xs{height:22px;padding:0 7px;font-size:11px}
+.btn-sm{height:26px;padding:0 10px;font-size:12px}
+/* FILTERS BAR */
+.fbar{background:var(--bg-surface);border-bottom:1px solid var(--border-color);padding:8px 22px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;flex-shrink:0}
+.fsel{height:28px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-surface-2);color:var(--text-primary);font-family:var(--font-sans);font-size:12px;padding:0 22px 0 7px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4'%3E%3Cpath d='M0 0l3.5 4L7 0z' fill='%235e6c84'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 5px center;cursor:pointer}
+.finp{height:28px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-surface-2);color:var(--text-primary);font-family:var(--font-sans);font-size:12px;padding:0 7px;width:140px}
+/* CARDS */
+.card{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);box-shadow:var(--shadow-sm)}
+.card-hdr{padding:12px 16px 8px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between}
+.card-ttl{font-size:12px;font-weight:600;color:var(--text-primary)}
+.card-body{padding:14px 16px}
+/* STAT CARDS */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.scard{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:12px 14px;position:relative;overflow:hidden;cursor:pointer;transition:box-shadow .15s,transform .15s}
+.scard:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.scard .slbl{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.scard .sval{font-size:26px;font-weight:700;color:var(--text-primary);line-height:1;font-family:var(--font-mono)}
+.scard .ssub{font-size:11px;color:var(--text-secondary);margin-top:3px}
+.scard .sacc{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius-md) var(--radius-md) 0 0}
+.ab .sacc{background:var(--blue)}.ag .sacc{background:var(--green)}.aa .sacc{background:var(--amber)}.ar .sacc{background:var(--red)}.ap .sacc{background:var(--purple)}.at .sacc{background:var(--teal)}
+/* TABLES */
+.twrap{overflow-x:auto;border-radius:var(--radius-md);border:1px solid var(--border-color);background:var(--bg-surface)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead tr{background:var(--bg-surface-2);border-bottom:2px solid var(--border-color)}
+th{padding:8px 10px;text-align:left;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);white-space:nowrap;cursor:pointer;user-select:none}
+td{padding:8px 10px;border-bottom:1px solid var(--border-color);color:var(--text-primary);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--bg-surface-2)}
+tbody tr.sel-row{background:var(--accent-light)}
+.tchk{width:14px;height:14px;cursor:pointer}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+.b-gr{background:var(--green-bg);color:var(--green)}
+.b-am{background:var(--amber-bg);color:var(--amber)}
+.b-re{background:var(--red-bg);color:var(--red)}
+.b-bl{background:var(--blue-bg);color:var(--blue)}
+.b-pu{background:var(--purple-bg);color:var(--purple)}
+.b-te{background:var(--teal-bg);color:var(--teal)}
+.b-gy{background:var(--bg-surface-3);color:var(--text-secondary)}
+/* HEALTH DOTS */
+.hdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;vertical-align:middle}
+.hg{background:var(--green)}.ha{background:var(--amber)}.hr2{background:var(--red)}
+/* PROGRESS */
+.pbar{height:5px;background:var(--bg-surface-3);border-radius:3px;overflow:hidden}
+.pfill{height:100%;border-radius:3px;background:var(--accent);transition:width .3s}
+.pfill.done{background:var(--green)}.pfill.risk{background:var(--amber)}.pfill.od{background:var(--red)}
+/* FORMS */
+.fg{margin-bottom:14px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+label{display:block;font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+label .req{color:var(--red);margin-left:2px}
+input[type=text],input[type=date],input[type=number],input[type=email],select,textarea{width:100%;height:32px;border:1px solid var(--border-color-2);border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--text-primary);font-family:var(--font-sans);font-size:12px;padding:0 9px;transition:border-color .12s}
+textarea{height:auto;padding:7px 9px;resize:vertical;min-height:60px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,82,204,.12)}
+.inp-err{border-color:var(--red)!important}
+/* MODALS */
+.moverlay{position:fixed;inset:0;background:rgba(9,30,66,.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px;backdrop-filter:blur(2px)}
+.moverlay.hidden{display:none}
+.modal{background:var(--bg-surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:100%;max-width:620px;max-height:92vh;display:flex;flex-direction:column;border:1px solid var(--border-color)}
+.modal-lg{max-width:820px}.modal-sm{max-width:400px}.modal-xl{max-width:1000px}
+.mhdr{padding:16px 20px 12px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.mttl{font-size:15px;font-weight:700}
+.mcls{width:26px;height:26px;border:none;background:transparent;cursor:pointer;color:var(--text-muted);font-size:17px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm)}
+.mcls:hover{background:var(--bg-surface-3);color:var(--text-primary)}
+.mbody{padding:18px 20px;overflow-y:auto;flex:1}
+.mfoot{padding:12px 20px;border-top:1px solid var(--border-color);display:flex;justify-content:flex-end;gap:7px;flex-shrink:0}
+/* TOASTS */
+#toasts{position:fixed;bottom:18px;right:18px;z-index:2000;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:var(--radius-md);background:var(--text-primary);color:var(--bg-surface);font-size:12px;box-shadow:var(--shadow-lg);pointer-events:all;animation:tsIn .2s ease,tsOut .3s ease 2.7s forwards;min-width:240px;max-width:380px}
+.toast.success{background:var(--green)}.toast.error{background:var(--red)}.toast.warning{background:var(--amber);color:#333}.toast.info{background:var(--blue)}
+@keyframes tsIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes tsOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(8px)}}
+/* TABS */
+.tabs{display:flex;border-bottom:2px solid var(--border-color);gap:0;flex-shrink:0}
+.tab{padding:7px 14px;font-size:12px;font-weight:500;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .12s;white-space:nowrap}
+.tab:hover{color:var(--text-primary)}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+/* VIEW TOGGLE */
+.vtog{display:flex;border:1px solid var(--border-color);border-radius:var(--radius-sm);overflow:hidden}
+.vbtn{padding:4px 9px;font-size:11px;cursor:pointer;background:var(--bg-surface);color:var(--text-secondary);border:none;transition:all .12s}
+.vbtn.active{background:var(--accent);color:#fff}.vbtn:hover:not(.active){background:var(--bg-surface-3)}
+/* KANBAN */
+.kboard{display:flex;gap:12px;overflow-x:auto;padding-bottom:14px;align-items:flex-start}
+.kcol{background:var(--bg-surface-2);border-radius:var(--radius-md);border:1px solid var(--border-color);width:210px;flex-shrink:0}
+.kcol-hdr{padding:9px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between}
+.kcol-body{padding:8px;display:flex;flex-direction:column;gap:7px;min-height:60px}
+.kcard{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:9px 10px;cursor:pointer;transition:box-shadow .12s;border-left:3px solid transparent}
+.kcard:hover{box-shadow:var(--shadow-md)}
+.kcard.pc{border-left-color:var(--red)}.kcard.ph{border-left-color:var(--amber)}.kcard.pm{border-left-color:var(--blue)}.kcard.pl{border-left-color:var(--green)}
+.kcard-ttl{font-size:11px;font-weight:500;color:var(--text-primary);margin-bottom:5px}
+.kcard-meta{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.kcard-owner{font-size:10px;color:var(--text-muted)}.kcard-due{font-size:10px;color:var(--text-secondary)}
+.kcard-due.od{color:var(--red);font-weight:600}
+/* CALENDAR */
+.cal-grid{border:1px solid var(--border-color);border-radius:var(--radius-md);overflow:hidden;background:var(--bg-surface)}
+.cal-hdr{display:grid;grid-template-columns:repeat(7,1fr);background:var(--bg-surface-2);border-bottom:1px solid var(--border-color)}
+.cal-dn{padding:7px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary)}
+.cal-body{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-cell{border-right:1px solid var(--border-color);border-bottom:1px solid var(--border-color);padding:5px;min-height:82px;background:var(--bg-surface);transition:background .1s;cursor:pointer}
+.cal-cell:nth-child(7n){border-right:none}
+.cal-cell:hover{background:var(--bg-surface-2)}
+.cal-cell.om .dnum{color:var(--text-muted)}
+.cal-cell.today{background:var(--accent-light)}
+.cal-cell.today .dnum{background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px}
+.dnum{font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:3px}
+.ci{font-size:9px;padding:1px 4px;border-radius:2px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-t{background:var(--blue-bg);color:var(--blue)}
+.ci-m{background:var(--purple-bg);color:var(--purple)}
+.ci-r{background:var(--red-bg);color:var(--red)}
+.ci-od{background:var(--red);color:#fff}
+/* GANTT */
+.gantt-wrap{overflow-x:auto}
+.g-hdr{display:flex;background:var(--bg-surface-2);border-bottom:2px solid var(--border-color);position:sticky;top:0;z-index:10}
+.g-lbl-hdr{flex-shrink:0;padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text-secondary);background:var(--bg-surface-2);border-right:1px solid var(--border-color)}
+.g-month{border-right:1px solid var(--border-color);padding:5px 6px;font-size:10px;font-weight:600;text-align:center;background:var(--bg-surface-2);color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0}
+.g-row{display:flex;border-bottom:1px solid var(--border-color);min-height:30px;align-items:center}
+.g-row:hover{background:var(--bg-surface-2)}
+.g-lbl{flex-shrink:0;border-right:1px solid var(--border-color);padding:4px 10px;display:flex;align-items:center;gap:5px}
+.g-lbl-nm{font-size:11px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.g-track{flex:1;position:relative;height:30px}
+.g-bar{position:absolute;height:16px;border-radius:3px;top:7px;display:flex;align-items:center;padding:0 5px;font-size:9px;font-weight:500;color:#fff;overflow:hidden;white-space:nowrap;cursor:pointer;min-width:4px}
+.g-bar:hover{opacity:.82}
+.g-bar.gp{background:var(--purple)}.g-bar.gm{background:var(--blue)}.g-bar.gt{background:var(--teal)}
+.g-bar.gc{background:var(--green)}.g-bar.god{background:var(--red)}.g-bar.gat{background:var(--amber)}
+/* EMPTY STATE */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center;color:var(--text-muted)}
+.empty-ico{font-size:40px;margin-bottom:12px;opacity:.4}
+.empty-ttl{font-size:15px;font-weight:600;color:var(--text-secondary);margin-bottom:5px}
+.empty-desc{font-size:12px;color:var(--text-muted);max-width:300px;line-height:1.5}
+/* CHARTS */
+.chart-rows{display:flex;flex-direction:column;gap:5px}
+.chart-row{display:flex;align-items:center;gap:7px}
+.chart-lbl{font-size:10px;color:var(--text-secondary);width:90px;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chart-track{flex:1;height:16px;background:var(--bg-surface-3);border-radius:3px;overflow:hidden}
+.chart-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:5px;font-size:9px;color:#fff;font-weight:600;transition:width .4s}
+.chart-val{font-size:10px;font-weight:700;color:var(--text-primary);min-width:24px;font-family:var(--font-mono)}
+/* REPORT */
+.rpt-wrap{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:28px;max-width:780px}
+.rpt-hdr{border-bottom:2px solid var(--accent);padding-bottom:14px;margin-bottom:18px}
+.rpt-title{font-size:18px;font-weight:700;color:var(--text-primary)}
+.rpt-sub{font-size:12px;color:var(--text-secondary);margin-top:3px}
+.rpt-sec{margin-bottom:18px}
+.rpt-sec-ttl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border-color)}
+.rpt-kgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.rpt-kpi{background:var(--bg-surface-2);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:9px;text-align:center}
+.rpt-kpi-v{font-size:20px;font-weight:700;font-family:var(--font-mono);color:var(--text-primary)}
+.rpt-kpi-l{font-size:10px;color:var(--text-muted)}
+.rpt-list{list-style:none;padding:0}
+.rpt-list li{font-size:11px;color:var(--text-secondary);padding:3px 0;border-bottom:1px solid var(--border-color);display:flex;gap:6px}
+.rpt-list li::before{content:'•';color:var(--accent);flex-shrink:0}
+/* ADMIN */
+.adm-item{display:flex;align-items:center;padding:7px 10px;border-bottom:1px solid var(--border-color);gap:8px;background:var(--bg-surface)}
+.adm-item:hover{background:var(--bg-surface-2)}
+.adm-nm{flex:1;font-size:12px;color:var(--text-primary)}
+/* AUDIT */
+.audit-item{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border-color)}
+.audit-ico{width:26px;height:26px;border-radius:50%;background:var(--bg-surface-3);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:1px}
+.audit-action{font-size:11px;color:var(--text-primary);font-weight:500}
+.audit-meta{font-size:10px;color:var(--text-muted);margin-top:1px}
+/* COMMENTS */
+.cmt-item{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border-color)}
+.cmt-av{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+.cmt-auth{font-size:11px;font-weight:600;color:var(--text-primary)}
+.cmt-date{font-size:10px;color:var(--text-muted)}
+.cmt-txt{font-size:11px;color:var(--text-secondary);line-height:1.4;margin-top:2px}
+/* CONFIRM */
+.cfm-ico{font-size:32px;text-align:center;margin-bottom:8px}
+.cfm-msg{font-size:13px;color:var(--text-secondary);text-align:center;line-height:1.5}
+/* STATUS BAR */
+#sbar{background:var(--bg-surface-2);border-top:1px solid var(--border-color);padding:3px 22px;font-size:10px;color:var(--text-muted);display:flex;align-items:center;gap:14px;flex-shrink:0}
+#sbar span{display:flex;align-items:center;gap:3px}
+/* SAVED VIEWS */
+.svitem{padding:6px 10px;font-size:11px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:5px;transition:background .1s}
+.svitem:hover{background:var(--bg-surface-2);color:var(--text-primary)}
+.svdel{margin-left:auto;opacity:0;font-size:12px;color:var(--red)}
+.svitem:hover .svdel{opacity:1}
+/* USER MENU */
+.umenu{position:absolute;top:calc(var(--header-height) + 3px);right:14px;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);z-index:200;width:200px;padding:6px 0}
+.umenu.hidden{display:none}
+.umi{padding:7px 12px;font-size:12px;cursor:pointer;color:var(--text-primary);display:flex;align-items:center;gap:7px}
+.umi:hover{background:var(--bg-surface-2)}
+.umsep{height:1px;background:var(--border-color);margin:3px 0}
+/* DETAIL FIELD */
+.df{margin-bottom:10px}
+.df-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:2px}
+.df-val{font-size:12px;color:var(--text-primary)}
+/* RISK CARD */
+.rc{border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:10px 12px;background:var(--bg-surface);border-left:4px solid var(--border-color);margin-bottom:7px;cursor:pointer}
+.rc.rcc{border-left-color:var(--red)}.rc.rch{border-left-color:var(--amber)}.rc.rcm{border-left-color:var(--blue)}.rc.rcl{border-left-color:var(--green)}
+/* UTILS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}
+.flex{display:flex}.flex1{flex:1}.gap6{gap:6px}.gap8{gap:8px}.gap12{gap:12px}
+.hidden{display:none!important}.tr{text-align:right}.tc{text-align:center}
+.mono{font-family:var(--font-mono)}.bold{font-weight:700}.tmuted{color:var(--text-muted)}.tsm{font-size:11px}
+.trunc{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.od-text{color:var(--red);font-weight:600}
+.clink{color:var(--accent);cursor:pointer;text-decoration:underline;font-size:11px}
+.sec-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border-color)}
+.report-nav-item{padding:8px 12px;font-size:12px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:6px;border-left:3px solid transparent;transition:all .1s}
+.report-nav-item:hover{background:var(--bg-surface-2);color:var(--text-primary)}
+.report-nav-item.active{background:var(--accent-light);color:var(--accent);border-left-color:var(--accent);font-weight:600}
+@media(max-width:1100px){.logo{width:240px;min-width:240px;max-width:240px}#projSel{width:210px}.btn{padding:0 9px}}
+@media(max-width:900px){#sidebar{width:50px}.nitem span:not(.nico){display:none}.snav-lbl,.nbadge{display:none}.logo{width:44px;min-width:44px;max-width:44px}.logo-txt,.hdiv{display:none}#projSel{max-width:210px}.hacts .btn-p{font-size:0;padding:0 9px}.hacts .btn-p::after{content:'+';font-size:16px}}
+</style>
+</head>
+<body data-theme="light">
+<div id="app">
+<!-- HEADER -->
+<header id="hdr">
+  <div class="logo">
+    <div class="logo-box">P</div>
+    <div class="logo-txt">Project Delivery Control Center<small>Enterprise Delivery Management</small></div>
+  </div>
+  <div class="hdiv"></div>
+  <select id="projSel" onchange="onProjSelChange()">
+    <option value="all">— All Projects —</option>
+  </select>
+  <div class="hsp"></div>
+  <div class="hacts">
+    <button class="btn btn-p btn-sm" onclick="quickAddTask()">＋ Quick Task</button>
+    <button class="bico" onclick="exportCurrentView()" title="Export">⬇</button>
+    <button class="bico" onclick="showBackupModal()" title="Backup/Restore">💾</button>
+    <button class="bico" onclick="cycleTheme()" title="Toggle Theme">🌗</button>
+    <div id="curUser" onclick="toggleUserMenu()">
+      <div class="uavatar" id="uav">PM</div>
+      <span id="unm">PM User</span>
+    </div>
+  </div>
+</header>
+<!-- USER MENU -->
+<div class="umenu hidden" id="umenu">
+  <div class="umi" onclick="openChangeUser()">✏️ Change User</div>
+  <div class="umsep"></div>
+  <div class="umi" onclick="navTo('admin')">⚙️ Administration</div>
+  <div class="umi" onclick="navTo('data')">🗄️ Data Management</div>
+  <div class="umsep"></div>
+  <div class="umi" onclick="loadDemoData()">🎲 Load Demo Data</div>
+  <div class="umi" onclick="confirmClearAll()">🗑️ Clear All Data</div>
+</div>
+<!-- MAIN LAYOUT -->
+<div id="mlayout">
+<nav id="sidebar">
+  <div class="snav-sec">
+    <div class="snav-lbl">Overview</div>
+    <div class="nitem active" data-page="dashboard" onclick="navTo('dashboard')"><span class="nico">📊</span><span>Dashboard</span></div>
+  </div>
+  <div class="snav-sec">
+    <div class="snav-lbl">Delivery</div>
+    <div class="nitem" data-page="projects" onclick="navTo('projects')"><span class="nico">📁</span><span>Projects</span></div>
+    <div class="nitem" data-page="timeline" onclick="navTo('timeline')"><span class="nico">📅</span><span>Timeline</span></div>
+    <div class="nitem" data-page="milestones" onclick="navTo('milestones')"><span class="nico">🏁</span><span>Milestones</span></div>
+    <div class="nitem" data-page="tasks" onclick="navTo('tasks')"><span class="nico">✅</span><span>Tasks</span><span class="nbadge hidden" id="odBadge">0</span></div>
+  </div>
+  <div class="snav-sec">
+    <div class="snav-lbl">Governance</div>
+    <div class="nitem" data-page="risks" onclick="navTo('risks')"><span class="nico">⚠️</span><span>Risks &amp; Issues</span><span class="nbadge hidden" id="rkBadge">0</span></div>
+    <div class="nitem" data-page="calendar" onclick="navTo('calendar')"><span class="nico">🗓️</span><span>Calendar</span></div>
+  </div>
+  <div class="snav-sec">
+    <div class="snav-lbl">Reporting</div>
+    <div class="nitem" data-page="reports" onclick="navTo('reports')"><span class="nico">📋</span><span>Reports</span></div>
+  </div>
+  <div class="snav-sec">
+    <div class="snav-lbl">System</div>
+    <div class="nitem" data-page="audit" onclick="navTo('audit')"><span class="nico">🔍</span><span>Audit Trail</span></div>
+    <div class="nitem" data-page="admin" onclick="navTo('admin')"><span class="nico">⚙️</span><span>Administration</span></div>
+    <div class="nitem" data-page="data" onclick="navTo('data')"><span class="nico">🗄️</span><span>Data Management</span></div>
+  </div>
+</nav>
+<main id="content">
+<!-- PAGE: DASHBOARD -->
+<div class="pview active" id="page-dashboard">
+  <div class="phdr">
+    <div><div class="ptitle">Executive Dashboard</div><div class="psub" id="dash-sub">All Projects Overview</div></div>
+    <div class="pacts">
+      <div class="tabs" style="border:none;margin:0;gap:2px">
+        <div class="tab active" onclick="switchDashTab('exec',this)">Executive</div>
+        <div class="tab" onclick="switchDashTab('delivery',this)">Delivery</div>
+        <div class="tab" onclick="switchDashTab('risk',this)">Risk View</div>
+        <div class="tab" onclick="switchDashTab('analysis',this)">Analysis</div>
+      </div>
+      <button class="btn btn-s btn-sm" onclick="renderDash()">↻</button>
+    </div>
+  </div>
+  <div class="pbody" id="dash-body"></div>
+</div>
+<!-- PAGE: PROJECTS -->
+<div class="pview" id="page-projects">
+  <div class="phdr">
+    <div><div class="ptitle">Projects</div><div class="psub" id="proj-sub">Manage projects</div></div>
+    <div class="pacts">
+      <div class="vtog">
+        <button class="vbtn active" onclick="setProjectView('grid',this)">⊞ Grid</button>
+        <button class="vbtn" onclick="setProjectView('table',this)">≡ Table</button>
+      </div>
+      <button class="btn btn-p btn-sm" onclick="openProjModal()">＋ New Project</button>
+    </div>
+  </div>
+  <div class="fbar">
+    <select class="fsel" id="pf-status" onchange="renderProjects()"><option value="">All Statuses</option></select>
+    <select class="fsel" id="pf-health" onchange="renderProjects()"><option value="">All Health</option></select>
+    <input class="finp" id="pf-search" placeholder="Search projects…" oninput="renderProjects()">
+    <button class="btn btn-g btn-sm" onclick="clearProjFilters()">✕ Clear</button>
+  </div>
+  <div class="pbody" id="proj-body"></div>
+</div>
+<!-- PAGE: TIMELINE -->
+<div class="pview" id="page-timeline">
+  <div class="phdr">
+    <div><div class="ptitle">Timeline</div><div class="psub">Gantt-style project timeline</div></div>
+    <div class="pacts">
+      <div class="tabs" style="border:none;margin:0;gap:2px">
+        <div class="tab active" onclick="switchTimelineView('month',this)">Monthly</div>
+        <div class="tab" onclick="switchTimelineView('week',this)">Weekly</div>
+        <div class="tab" onclick="switchTimelineView('phase',this)">By Phase</div>
+      </div>
+      <button class="btn btn-s btn-sm" onclick="renderTimeline()">↻</button>
+    </div>
+  </div>
+  <div class="fbar">
+    <select class="fsel" id="tf-proj" onchange="renderTimeline()"><option value="">All Projects</option></select>
+    <select class="fsel" id="tf-phase" onchange="renderTimeline()"><option value="">All Phases</option></select>
+    <select class="fsel" id="tf-type" onchange="renderTimeline()"><option value="">All Types</option><option value="phase">Projects</option><option value="milestone">Milestones</option><option value="task">Tasks</option></select>
+    <select class="fsel" id="tf-owner" onchange="renderTimeline()"><option value="">All Owners</option></select>
+  </div>
+  <div class="pbody" id="tl-body" style="padding:0;overflow-y:auto;"></div>
+</div>
+<!-- PAGE: MILESTONES -->
+<div class="pview" id="page-milestones">
+  <div class="phdr">
+    <div><div class="ptitle">Milestones</div><div class="psub" id="ms-sub">Track delivery milestones</div></div>
+    <div class="pacts">
+      <div class="vtog">
+        <button class="vbtn active" onclick="setMsView('table',this)">≡ Table</button>
+        <button class="vbtn" onclick="setMsView('cards',this)">⊞ Cards</button>
+      </div>
+      <button class="btn btn-s btn-sm" onclick="exportMilestones()">⬇ Export</button>
+      <button class="btn btn-p btn-sm" onclick="openMsModal()">＋ New Milestone</button>
+    </div>
+  </div>
+  <div class="fbar">
+    <select class="fsel" id="mf-proj" onchange="renderMilestones()"><option value="">All Projects</option></select>
+    <select class="fsel" id="mf-phase" onchange="renderMilestones()"><option value="">All Phases</option></select>
+    <select class="fsel" id="mf-status" onchange="renderMilestones()"><option value="">All Statuses</option></select>
+    <select class="fsel" id="mf-health" onchange="renderMilestones()"><option value="">All Health</option></select>
+    <select class="fsel" id="mf-owner" onchange="renderMilestones()"><option value="">All Owners</option></select>
+    <input class="finp" id="mf-search" placeholder="Search…" oninput="renderMilestones()">
+    <button class="btn btn-g btn-sm" onclick="clearMsFilters()">✕ Clear</button>
+  </div>
+  <div class="pbody" id="ms-body" style="padding:0;overflow-y:auto;"></div>
+</div>
+<!-- PAGE: TASKS -->
+<div class="pview" id="page-tasks">
+  <div class="phdr">
+    <div><div class="ptitle">Tasks</div><div class="psub" id="tk-sub">Manage and track all tasks</div></div>
+    <div class="pacts">
+      <div class="vtog">
+        <button class="vbtn active" onclick="setTkView('table',this)">≡ Table</button>
+        <button class="vbtn" onclick="setTkView('kanban',this)">⊟ Kanban</button>
+      </div>
+      <button class="btn btn-s btn-sm hidden" id="bulkBtn" onclick="showBulkModal()">Bulk Actions</button>
+      <button class="btn btn-s btn-sm" onclick="exportTasks()">⬇ Export</button>
+      <button class="btn btn-p btn-sm" onclick="openTkModal()">＋ New Task</button>
+    </div>
+  </div>
+  <div class="fbar">
+    <select class="fsel" id="tkf-proj" onchange="renderTasks()"><option value="">All Projects</option></select>
+    <select class="fsel" id="tkf-phase" onchange="renderTasks()"><option value="">All Phases</option></select>
+    <select class="fsel" id="tkf-ms" onchange="renderTasks()"><option value="">All Milestones</option></select>
+    <select class="fsel" id="tkf-status" onchange="renderTasks()"><option value="">All Statuses</option></select>
+    <select class="fsel" id="tkf-pri" onchange="renderTasks()"><option value="">All Priorities</option></select>
+    <select class="fsel" id="tkf-owner" onchange="renderTasks()"><option value="">All Owners</option></select>
+    <select class="fsel" id="tkf-quick" onchange="applyQuickFilter(this.value)"><option value="">Quick Filters</option><option value="overdue">Overdue</option><option value="today">Due Today</option><option value="week">Due This Week</option><option value="blocked">Blocked</option><option value="noowner">No Owner</option></select>
+    <input class="finp" id="tkf-search" placeholder="Search tasks…" oninput="renderTasks()">
+    <button class="btn btn-g btn-sm" onclick="clearTkFilters()">✕ Clear</button>
+  </div>
+  <div style="display:flex;flex:1;overflow:hidden;min-height:0">
+    <div style="flex:1;overflow:auto" id="tk-body"></div>
+    <div style="width:172px;border-left:1px solid var(--border-color);background:var(--bg-surface);flex-shrink:0;overflow-y:auto;display:flex;flex-direction:column">
+      <div style="padding:9px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);border-bottom:1px solid var(--border-color)">Saved Views</div>
+      <div id="sv-list" style="flex:1"></div>
+      <div style="padding:7px 10px;border-top:1px solid var(--border-color)"><button class="btn btn-g btn-xs" onclick="saveCurrentView()" style="width:100%">＋ Save View</button></div>
+    </div>
+  </div>
+</div>
+<!-- PAGE: RISKS -->
+<div class="pview" id="page-risks">
+  <div class="phdr">
+    <div><div class="ptitle">Risks, Issues &amp; Dependencies</div><div class="psub">Governance register</div></div>
+    <div class="pacts">
+      <div class="tabs" style="border:none;margin:0;gap:2px">
+        <div class="tab active" onclick="switchRiskTab('all',this)">All</div>
+        <div class="tab" onclick="switchRiskTab('Risk',this)">Risks</div>
+        <div class="tab" onclick="switchRiskTab('Issue',this)">Issues</div>
+        <div class="tab" onclick="switchRiskTab('Dependency',this)">Dependencies</div>
+        <div class="tab" onclick="switchRiskTab('Decision',this)">Decisions</div>
+      </div>
+      <button class="btn btn-s btn-sm" onclick="exportRisks()">⬇ Export</button>
+      <button class="btn btn-p btn-sm" onclick="openRkModal()">＋ New Record</button>
+    </div>
+  </div>
+  <div class="fbar">
+    <select class="fsel" id="rf-proj" onchange="renderRisks()"><option value="">All Projects</option></select>
+    <select class="fsel" id="rf-status" onchange="renderRisks()"><option value="">All Statuses</option></select>
+    <select class="fsel" id="rf-pri" onchange="renderRisks()"><option value="">All Priorities</option></select>
+    <select class="fsel" id="rf-owner" onchange="renderRisks()"><option value="">All Owners</option></select>
+    <input class="finp" id="rf-search" placeholder="Search…" oninput="renderRisks()">
+    <button class="btn btn-g btn-sm" onclick="clearRkFilters()">✕ Clear</button>
+  </div>
+  <div class="pbody" id="rk-body" style="padding:0;overflow-y:auto;"></div>
+</div>
+<!-- PAGE: CALENDAR -->
+<div class="pview" id="page-calendar">
+  <div class="phdr">
+    <div><div class="ptitle">Calendar</div><div class="psub" id="cal-ttl">Calendar View</div></div>
+    <div class="pacts">
+      <button class="btn btn-s btn-sm" onclick="calNav(-1)">◀ Prev</button>
+      <button class="btn btn-s btn-sm" onclick="calNav(0)">Today</button>
+      <button class="btn btn-s btn-sm" onclick="calNav(1)">Next ▶</button>
+    </div>
+  </div>
+  <div class="fbar">
+    <select class="fsel" id="calf-proj" onchange="renderCalendar()"><option value="">All Projects</option></select>
+    <label style="margin:0;font-size:11px;display:flex;gap:4px;align-items:center;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-secondary)"><input type="checkbox" id="calf-tasks" checked onchange="renderCalendar()"> Tasks</label>
+    <label style="margin:0;font-size:11px;display:flex;gap:4px;align-items:center;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-secondary)"><input type="checkbox" id="calf-ms" checked onchange="renderCalendar()"> Milestones</label>
+    <label style="margin:0;font-size:11px;display:flex;gap:4px;align-items:center;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-secondary)"><input type="checkbox" id="calf-risks" checked onchange="renderCalendar()"> Risks/Issues</label>
+  </div>
+  <div class="pbody" id="cal-body"></div>
+</div>
+<!-- PAGE: REPORTS -->
+<div class="pview" id="page-reports">
+  <div class="phdr"><div><div class="ptitle">Reports</div><div class="psub">Generate and export delivery reports</div></div></div>
+  <div style="display:flex;flex:1;overflow:hidden;min-height:0">
+    <div style="width:190px;border-right:1px solid var(--border-color);background:var(--bg-surface);flex-shrink:0;overflow-y:auto">
+      <div style="padding:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);border-bottom:1px solid var(--border-color)">Available Reports</div>
+      <div id="rpt-nav"></div>
+    </div>
+    <div style="flex:1;overflow:auto;padding:18px" id="rpt-body">
+      <div class="empty"><div class="empty-ico">📋</div><div class="empty-ttl">Select a Report</div><div class="empty-desc">Choose a report from the left panel.</div></div>
+    </div>
+  </div>
+</div>
+<!-- PAGE: AUDIT -->
+<div class="pview" id="page-audit">
+  <div class="phdr">
+    <div><div class="ptitle">Audit Trail</div><div class="psub">System-wide change history</div></div>
+    <div class="pacts">
+      <button class="btn btn-s btn-sm" onclick="exportAudit()">⬇ Export</button>
+      <button class="btn btn-d btn-sm" onclick="confirmClearAudit()">🗑 Clear</button>
+    </div>
+  </div>
+  <div class="fbar">
+    <select class="fsel" id="auf-mod" onchange="renderAudit()"><option value="">All Modules</option><option>Project</option><option>Milestone</option><option>Task</option><option>Risk</option></select>
+    <select class="fsel" id="auf-action" onchange="renderAudit()"><option value="">All Actions</option><option>Created</option><option>Updated</option><option>Deleted</option><option>Comment</option></select>
+    <input class="finp" id="auf-search" placeholder="Search audit…" oninput="renderAudit()">
+    <button class="btn btn-g btn-sm" onclick="clearAuditFilters()">✕ Clear</button>
+  </div>
+  <div class="pbody" id="audit-body"></div>
+</div>
+<!-- PAGE: ADMIN -->
+<div class="pview" id="page-admin">
+  <div class="phdr">
+    <div><div class="ptitle">Administration</div><div class="psub">Configure dropdown values and system settings</div></div>
+    <div class="pacts"><button class="btn btn-s btn-sm" onclick="restoreDefaults()">↺ Restore Defaults</button></div>
+  </div>
+  <div class="pbody" id="admin-body"></div>
+</div>
+<!-- PAGE: DATA MANAGEMENT -->
+<div class="pview" id="page-data">
+  <div class="phdr"><div><div class="ptitle">Data Management</div><div class="psub">Backup, restore, import and export</div></div></div>
+  <div class="pbody" id="data-body"></div>
+</div>
+</main>
+</div>
+<!-- STATUS BAR -->
+<div id="sbar">
+  <span id="sb-proj">All Projects</span>
+  <span id="sb-tasks">0 tasks</span>
+  <span id="sb-od">0 overdue</span>
+  <span id="sb-user">User: —</span>
+  <span style="margin-left:auto" id="sb-time"></span>
+</div>
+</div>
+<!-- ===== MODALS ===== -->
+<!-- Project Modal -->
+<div class="moverlay hidden" id="proj-modal">
+  <div class="modal modal-lg">
+    <div class="mhdr"><div class="mttl" id="pm-title">New Project</div><button class="mcls" onclick="closeModal('proj-modal')">✕</button></div>
+    <div class="mbody">
+      <div class="frow"><div class="fg"><label>Project Name <span class="req">*</span></label><input type="text" id="pm-name" placeholder="Project name"></div><div class="fg"><label>Project Code</label><input type="text" id="pm-code" placeholder="e.g. PALM-001"></div></div>
+      <div class="frow"><div class="fg"><label>Customer / Client</label><input type="text" id="pm-customer"></div><div class="fg"><label>Project Manager</label><select id="pm-mgr"><option value="">— Select —</option></select></div></div>
+      <div class="frow"><div class="fg"><label>Sponsor</label><input type="text" id="pm-sponsor"></div><div class="fg"><label>Current Phase</label><select id="pm-phase"><option value="">— Select —</option></select></div></div>
+      <div class="frow3"><div class="fg"><label>Start Date</label><input type="date" id="pm-start"></div><div class="fg"><label>Target End Date</label><input type="date" id="pm-end"></div><div class="fg"><label>Actual End Date</label><input type="date" id="pm-aend"></div></div>
+      <div class="frow"><div class="fg"><label>Status</label><select id="pm-status"><option value="">— Select —</option></select></div><div class="fg"><label>Health</label><select id="pm-health"><option value="">— Select —</option></select></div></div>
+      <div class="frow"><div class="fg"><label>Delivery Team</label><input type="text" id="pm-dteam"></div><div class="fg"><label>Customer Team</label><input type="text" id="pm-cteam"></div></div>
+      <div class="fg"><label>Description</label><textarea id="pm-desc" placeholder="Project description…"></textarea></div>
+      <div class="fg"><label>Contracted Scope</label><textarea id="pm-scope"></textarea></div>
+      <div class="fg"><label>Notes</label><textarea id="pm-notes"></textarea></div>
+    </div>
+    <div class="mfoot"><button class="btn btn-s" onclick="closeModal('proj-modal')">Cancel</button><button class="btn btn-p" onclick="saveProject()">Save Project</button></div>
+  </div>
+</div>
+<!-- Milestone Modal -->
+<div class="moverlay hidden" id="ms-modal">
+  <div class="modal modal-lg">
+    <div class="mhdr"><div class="mttl" id="mm-title">New Milestone</div><button class="mcls" onclick="closeModal('ms-modal')">✕</button></div>
+    <div class="mbody">
+      <div class="frow"><div class="fg"><label>Milestone Name <span class="req">*</span></label><input type="text" id="mm-name"></div><div class="fg"><label>Project <span class="req">*</span></label><select id="mm-proj" onchange="onMsProjChange()"><option value="">— Select —</option></select></div></div>
+      <div class="frow"><div class="fg"><label>Phase</label><select id="mm-phase"><option value="">— Select —</option></select></div><div class="fg"><label>Owner</label><select id="mm-owner"><option value="">— Select —</option></select></div></div>
+      <div class="frow3"><div class="fg"><label>Planned Start</label><input type="date" id="mm-start"></div><div class="fg"><label>Due Date</label><input type="date" id="mm-due"></div><div class="fg"><label>Actual Date</label><input type="date" id="mm-actual"></div></div>
+      <div class="frow"><div class="fg"><label>Status</label><select id="mm-status"><option value="">— Select —</option></select></div><div class="fg"><label>Health</label><select id="mm-health"><option value="">— Select —</option></select></div></div>
+      <div class="frow"><div class="fg"><label>Completion %</label><input type="number" id="mm-pct" min="0" max="100" placeholder="0"></div><div class="fg"><label>Depends On</label><input type="text" id="mm-dep" placeholder="Dependency description"></div></div>
+      <div class="fg"><label>Remarks</label><textarea id="mm-remarks"></textarea></div>
+    </div>
+    <div class="mfoot"><button class="btn btn-s" onclick="closeModal('ms-modal')">Cancel</button><button class="btn btn-p" onclick="saveMilestone()">Save Milestone</button></div>
+  </div>
+</div>
+<!-- Task Modal -->
+<div class="moverlay hidden" id="tk-modal">
+  <div class="modal modal-lg">
+    <div class="mhdr"><div class="mttl" id="tkm-title">New Task</div><button class="mcls" onclick="closeModal('tk-modal')">✕</button></div>
+    <div class="mbody">
+      <div class="frow"><div class="fg"><label>Task Name <span class="req">*</span></label><input type="text" id="tkm-name"></div><div class="fg"><label>Project <span class="req">*</span></label><select id="tkm-proj" onchange="onTkProjChange()"><option value="">— Select —</option></select></div></div>
+      <div class="frow"><div class="fg"><label>Phase</label><select id="tkm-phase"><option value="">— Select —</option></select></div><div class="fg"><label>Milestone</label><select id="tkm-ms"><option value="">— None —</option></select></div></div>
+      <div class="frow"><div class="fg"><label>Owner</label><select id="tkm-owner"><option value="">— Select —</option></select></div><div class="fg"><label>Priority</label><select id="tkm-pri"><option value="">— Select —</option></select></div></div>
+      <div class="frow"><div class="fg"><label>Status</label><select id="tkm-status"><option value="">— Select —</option></select></div><div class="fg"><label>Health</label><select id="tkm-health"><option value="">— Select —</option></select></div></div>
+      <div class="frow3"><div class="fg"><label>Start Date</label><input type="date" id="tkm-start"></div><div class="fg"><label>Due Date</label><input type="date" id="tkm-due"></div><div class="fg"><label>Actual Completion</label><input type="date" id="tkm-actual"></div></div>
+      <div class="frow3"><div class="fg"><label>Completion %</label><input type="number" id="tkm-pct" min="0" max="100" placeholder="0"></div><div class="fg"><label>Est. Effort (hrs)</label><input type="number" id="tkm-est" min="0" placeholder="0"></div><div class="fg"><label>Actual Effort (hrs)</label><input type="number" id="tkm-act" min="0" placeholder="0"></div></div>
+      <div class="frow"><div class="fg"><label>Depends On</label><input type="text" id="tkm-dep"></div><div class="fg"><label>Blocking</label><input type="text" id="tkm-block"></div></div>
+      <div class="fg"><label style="text-transform:none;font-size:12px;display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="tkm-risk" style="width:auto;height:auto"> Flag as Risk</label></div>
+      <div class="fg"><label>Description</label><textarea id="tkm-desc"></textarea></div>
+    </div>
+    <div class="mfoot"><button class="btn btn-s" onclick="closeModal('tk-modal')">Cancel</button><button class="btn btn-p" onclick="saveTask()">Save Task</button></div>
+  </div>
+</div>
+<!-- Risk Modal -->
+<div class="moverlay hidden" id="rk-modal">
+  <div class="modal modal-lg">
+    <div class="mhdr"><div class="mttl" id="rkm-modal-title">New Risk / Issue</div><button class="mcls" onclick="closeModal('rk-modal')">✕</button></div>
+    <div class="mbody">
+      <div class="frow"><div class="fg"><label>Title <span class="req">*</span></label><input type="text" id="rkm-title"></div><div class="fg"><label>Type</label><select id="rkm-type"><option value="Risk">Risk</option><option value="Issue">Issue</option><option value="Dependency">Dependency</option><option value="Decision">Decision</option></select></div></div>
+      <div class="frow"><div class="fg"><label>Project</label><select id="rkm-proj"><option value="">— Select —</option></select></div><div class="fg"><label>Phase</label><select id="rkm-phase"><option value="">— Select —</option></select></div></div>
+      <div class="frow"><div class="fg"><label>Owner</label><select id="rkm-owner"><option value="">— Select —</option></select></div><div class="fg"><label>Priority</label><select id="rkm-pri"><option value="">— Select —</option></select></div></div>
+      <div class="frow"><div class="fg"><label>Impact</label><select id="rkm-impact"><option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option><option value="Critical">Critical</option></select></div><div class="fg"><label>Probability</label><select id="rkm-prob"><option value="Low">Low</option><option value="Medium" selected>Medium</option><option value="High">High</option></select></div></div>
+      <div class="frow"><div class="fg"><label>Status</label><select id="rkm-status"><option value="">— Select —</option></select></div><div class="fg"><label>Due Date</label><input type="date" id="rkm-due"></div></div>
+      <div class="fg"><label>Description</label><textarea id="rkm-desc"></textarea></div>
+      <div class="fg"><label>Mitigation / Action Plan</label><textarea id="rkm-mit"></textarea></div>
+      <div class="fg"><label>Resolution</label><textarea id="rkm-res"></textarea></div>
+    </div>
+    <div class="mfoot"><button class="btn btn-s" onclick="closeModal('rk-modal')">Cancel</button><button class="btn btn-p" onclick="saveRisk()">Save Record</button></div>
+  </div>
+</div>
+<!-- Detail Modal -->
+<div class="moverlay hidden" id="detail-modal">
+  <div class="modal modal-lg">
+    <div class="mhdr"><div class="mttl" id="det-title">Details</div><button class="mcls" onclick="closeModal('detail-modal')">✕</button></div>
+    <div class="mbody" id="det-body"></div>
+    <div class="mfoot" id="det-foot"></div>
+  </div>
+</div>
+<!-- Confirm Modal -->
+<div class="moverlay hidden" id="cfm-modal">
+  <div class="modal modal-sm">
+    <div class="mhdr"><div class="mttl" id="cfm-title">Confirm</div><button class="mcls" onclick="closeModal('cfm-modal')">✕</button></div>
+    <div class="mbody"><div class="cfm-ico" id="cfm-ico">⚠️</div><div class="cfm-msg" id="cfm-msg">Are you sure?</div></div>
+    <div class="mfoot"><button class="btn btn-s" onclick="closeModal('cfm-modal')">Cancel</button><button class="btn btn-d" id="cfm-ok" onclick="doConfirm()">Confirm</button></div>
+  </div>
+</div>
+<!-- User Modal -->
+<div class="moverlay hidden" id="user-modal">
+  <div class="modal modal-sm">
+    <div class="mhdr"><div class="mttl">Change User</div><button class="mcls" onclick="closeModal('user-modal')">✕</button></div>
+    <div class="mbody"><div class="fg"><label>Your Name</label><input type="text" id="um-name" placeholder="Full name"></div><div class="fg"><label>Role</label><input type="text" id="um-role" placeholder="e.g. Project Manager"></div></div>
+    <div class="mfoot"><button class="btn btn-s" onclick="closeModal('user-modal')">Cancel</button><button class="btn btn-p" onclick="saveUser()">Save</button></div>
+  </div>
+</div>
+<!-- Bulk Modal -->
+<div class="moverlay hidden" id="bulk-modal">
+  <div class="modal modal-sm">
+    <div class="mhdr"><div class="mttl">Bulk Update Tasks</div><button class="mcls" onclick="closeModal('bulk-modal')">✕</button></div>
+    <div class="mbody">
+      <div class="fg"><label>Change Status</label><select id="bk-status"><option value="">— No Change —</option></select></div>
+      <div class="fg"><label>Change Owner</label><select id="bk-owner"><option value="">— No Change —</option></select></div>
+      <div class="fg"><label>Change Priority</label><select id="bk-pri"><option value="">— No Change —</option></select></div>
+      <div class="fg"><label>Change Due Date</label><input type="date" id="bk-due"></div>
+    </div>
+    <div class="mfoot"><button class="btn btn-s" onclick="closeModal('bulk-modal')">Cancel</button><button class="btn btn-p" onclick="applyBulk()">Apply to Selected</button></div>
+  </div>
+</div>
+<!-- Save View Modal -->
+<div class="moverlay hidden" id="sv-modal">
+  <div class="modal modal-sm">
+    <div class="mhdr"><div class="mttl">Save View</div><button class="mcls" onclick="closeModal('sv-modal')">✕</button></div>
+    <div class="mbody"><div class="fg"><label>View Name</label><input type="text" id="svm-name" placeholder="e.g. My Open Tasks"></div></div>
+    <div class="mfoot"><button class="btn btn-s" onclick="closeModal('sv-modal')">Cancel</button><button class="btn btn-p" onclick="doSaveView()">Save</button></div>
+  </div>
+</div>
+<!-- Quick Task Modal -->
+<div class="moverlay hidden" id="qt-modal">
+  <div class="modal modal-sm">
+    <div class="mhdr"><div class="mttl">Quick Add Task</div><button class="mcls" onclick="closeModal('qt-modal')">✕</button></div>
+    <div class="mbody">
+      <div class="fg"><label>Task Name <span class="req">*</span></label><input type="text" id="qt-name" placeholder="Task name"></div>
+      <div class="fg"><label>Project</label><select id="qt-proj"><option value="">— Select —</option></select></div>
+      <div class="frow"><div class="fg"><label>Owner</label><select id="qt-owner"><option value="">— None —</option></select></div><div class="fg"><label>Due Date</label><input type="date" id="qt-due"></div></div>
+      <div class="fg"><label>Priority</label><select id="qt-pri"><option value="Medium">Medium</option></select></div>
+    </div>
+    <div class="mfoot"><button class="btn btn-s" onclick="closeModal('qt-modal')">Cancel</button><button class="btn btn-p" onclick="saveQuickTask()">Add Task</button></div>
+  </div>
+</div>
+<!-- Backup Modal -->
+<div class="moverlay hidden" id="bk-modal">
+  <div class="modal modal-sm">
+    <div class="mhdr"><div class="mttl">Backup &amp; Restore</div><button class="mcls" onclick="closeModal('bk-modal')">✕</button></div>
+    <div class="mbody">
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px">Export a full backup of all data or restore from a previous backup file.</p>
+      <div class="fg"><button class="btn btn-p" style="width:100%" onclick="exportFullBackup()">⬇ Export Full Backup (JSON)</button></div>
+      <div class="fg"><label>Restore from Backup</label><input type="file" id="bk-file-modal" accept=".json" style="padding:4px;font-size:11px"></div>
+      <div class="fg"><button class="btn btn-s" style="width:100%" onclick="importBackup()">⬆ Restore Backup</button></div>
+    </div>
+    <div class="mfoot"><button class="btn btn-s" onclick="closeModal('bk-modal')">Close</button></div>
+  </div>
+</div>
+<!-- Toast Container -->
+<div id="toasts"></div>
+<script>
+// ============================================================
+// PDCC - Project Delivery Control Center - Core JS
+// ============================================================
+const SK={projects:'pdcc_p',milestones:'pdcc_m',tasks:'pdcc_t',risks:'pdcc_r',audit:'pdcc_a',config:'pdcc_cfg',views:'pdcc_v',theme:'pdcc_th',user:'pdcc_u'};
+const MEM_STORE={};
+function ld(k){
+  const key=SK[k];
+  try{const raw=localStorage.getItem(key);if(raw!==null)return JSON.parse(raw)}catch(e){}
+  try{return MEM_STORE[key]?JSON.parse(MEM_STORE[key]):null}catch(e){return null}
+}
+function sv(k,d){
+  const key=SK[k],raw=JSON.stringify(d);
+  MEM_STORE[key]=raw;
+  try{localStorage.setItem(key,raw)}catch(e){}
+}
+function rmStore(key){try{localStorage.removeItem(key)}catch(e){}delete MEM_STORE[key]}
+
+const DEF_CFG={
+  projectStatuses:['Not Started','Active','On Hold','Completed','Cancelled'],
+  projectHealth:['Green','Amber','Red'],
+  phases:['Initiation','Design','Build','CRP1','CRP2','SIT','UAT','Go-Live Preparation','Live','Hypercare','Closed'],
+  milestoneStatuses:['Not Started','In Progress','Completed','Delayed','At Risk','Cancelled'],
+  taskStatuses:['Not Started','In Progress','Blocked','Done','Cancelled'],
+  taskPriorities:['Low','Medium','High','Critical'],
+  riskStatuses:['Open','In Progress','Closed','Deferred','Cancelled'],
+  owners:['Alice Chen','Bob Smith','Carol White','David Lee','Emma Brown','Frank Miller'],
+  customers:['Acme Corp','Global Tech','Sunrise Ltd']
+};
+
+let APP={page:'dashboard',activePrj:'all',dashTab:'exec',tlView:'month',prjView:'grid',msView:'table',tkView:'table',rkTab:'all',calDate:new Date(),selTasks:new Set(),editId:null,confirmCb:null,curUser:{name:'PM User',role:'Project Manager'}};
+let D={projects:[],milestones:[],tasks:[],risks:[],audit:[]};
+let CFG={};
+
+function init(){
+  D.projects=ld('projects')||[];D.milestones=ld('milestones')||[];
+  D.tasks=ld('tasks')||[];D.risks=ld('risks')||[];D.audit=ld('audit')||[];
+  CFG=ld('config')||JSON.parse(JSON.stringify(DEF_CFG));
+  APP.curUser=ld('user')||{name:'PM User',role:'Project Manager'};
+  document.body.setAttribute('data-theme',ld('theme')||'light');
+  updateUserUI();populateProjSel();populateAllFilters();renderSavedViews();
+  renderAdminPage();renderDataPage();renderReportNav();renderDash();updateBadges();updateSbar();startClock();
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.moverlay:not(.hidden)').forEach(m=>m.classList.add('hidden'))});
+  document.addEventListener('click',e=>{if(!e.target.closest('#curUser')&&!e.target.closest('#umenu'))document.getElementById('umenu').classList.add('hidden')});
+}
+
+// ── IDs ──────────────────────────────────────────────────────
+function gid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
+
+// ── Date Utils ───────────────────────────────────────────────
+function tod(){return new Date().toISOString().split('T')[0]}
+function todD(){const d=new Date();d.setHours(0,0,0,0);return d}
+function pDate(s){if(!s)return null;const d=new Date(s+'T00:00:00');return isNaN(d)?null:d}
+function isOD(due,status){if(!due)return false;if(status&&['Done','Completed','Cancelled'].includes(status))return false;return pDate(due)<todD()}
+function isDT(due){if(!due)return false;return due===tod()}
+function isDTW(due){if(!due)return false;const d=pDate(due),t=todD(),e=new Date(t);e.setDate(t.getDate()+7);return d>=t&&d<=e}
+function fmtD(s){if(!s)return '—';const d=pDate(s);if(!d)return s;return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}
+function dBetween(a,b){const da=pDate(a),db=pDate(b);if(!da||!db)return 0;return Math.round((db-da)/86400000)}
+function sowDate(){const d=todD();d.setDate(d.getDate()-d.getDay());return d}
+function isThisWeek(ds){if(!ds)return false;const d=pDate(ds),s=sowDate(),e=new Date(s);e.setDate(s.getDate()+6);return d&&d>=s&&d<=e}
+
+// ── Toast ─────────────────────────────────────────────────────
+function toast(msg,type='success'){
+  const c=document.getElementById('toasts'),t=document.createElement('div');
+  t.className='toast '+type;
+  const icons={success:'✓',error:'✕',warning:'⚠',info:'ℹ'};
+  t.innerHTML=`<span>${icons[type]||'ℹ'}</span><span>${msg}</span>`;
+  c.appendChild(t);setTimeout(()=>t.remove(),3100)
+}
+
+// ── Modals ────────────────────────────────────────────────────
+function openModal(id){document.getElementById(id).classList.remove('hidden')}
+function closeModal(id){document.getElementById(id).classList.add('hidden');APP.editId=null}
+function showConfirm(title,msg,cb,ico='⚠️'){
+  document.getElementById('cfm-title').textContent=title;
+  document.getElementById('cfm-msg').textContent=msg;
+  document.getElementById('cfm-ico').textContent=ico;
+  APP.confirmCb=cb;openModal('cfm-modal')
+}
+function doConfirm(){if(APP.confirmCb)APP.confirmCb();closeModal('cfm-modal')}
+
+// ── User ─────────────────────────────────────────────────────
+function updateUserUI(){
+  const u=APP.curUser;
+  document.getElementById('unm').textContent=u.name||'User';
+  document.getElementById('uav').textContent=(u.name||'U').split(' ').map(w=>w[0]).join('').substr(0,2).toUpperCase();
+  document.getElementById('sb-user').textContent='User: '+(u.name||'—')
+}
+function toggleUserMenu(){document.getElementById('umenu').classList.toggle('hidden')}
+function openChangeUser(){document.getElementById('um-name').value=APP.curUser.name;document.getElementById('um-role').value=APP.curUser.role;openModal('user-modal');document.getElementById('umenu').classList.add('hidden')}
+function saveUser(){APP.curUser={name:document.getElementById('um-name').value||'PM User',role:document.getElementById('um-role').value||'PM'};sv('user',APP.curUser);updateUserUI();closeModal('user-modal');toast('User updated')}
+
+// ── Theme ─────────────────────────────────────────────────────
+const THEMES=['light','dark','slate'];
+function cycleTheme(){const c=document.body.getAttribute('data-theme');const n=THEMES[(THEMES.indexOf(c)+1)%THEMES.length];document.body.setAttribute('data-theme',n);sv('theme',n);toast('Theme: '+n,'info')}
+
+// ── Clock ─────────────────────────────────────────────────────
+function startClock(){function tick(){const n=new Date();document.getElementById('sb-time').textContent=n.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+' · '+n.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}tick();setInterval(tick,30000)}
+
+// ── Navigation ───────────────────────────────────────────────
+function navTo(page){
+  document.querySelectorAll('.pview').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nitem').forEach(n=>n.classList.remove('active'));
+  const el=document.getElementById('page-'+page);if(el)el.classList.add('active');
+  const ni=document.querySelector(`.nitem[data-page="${page}"]`);if(ni)ni.classList.add('active');
+  APP.page=page;
+  const actions={dashboard:renderDash,projects:()=>{populateProjFilters();renderProjects()},timeline:()=>{populateTlFilters();renderTimeline()},milestones:()=>{populateMsFilters();renderMilestones()},tasks:()=>{populateTkFilters();renderTasks()},risks:()=>{populateRkFilters();renderRisks()},calendar:()=>{populateCalFilters();renderCalendar()},reports:renderReportNav,audit:renderAudit,admin:renderAdminPage,data:renderDataPage};
+  if(actions[page])actions[page]();
+  document.getElementById('umenu').classList.add('hidden')
+}
+
+// ── Project Selector ─────────────────────────────────────────
+function populateProjSel(){
+  const sel=document.getElementById('projSel');const cur=sel.value;
+  sel.innerHTML='<option value="all">— All Projects —</option>';
+  D.projects.filter(p=>p.status!=='Cancelled').forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=(p.code?'['+p.code+'] ':'')+p.name;sel.appendChild(o)});
+  if(cur&&cur!=='all')sel.value=cur
+}
+function onProjSelChange(){
+  APP.activePrj=document.getElementById('projSel').value;
+  const p=getPrj(APP.activePrj);
+  document.getElementById('dash-sub').textContent=APP.activePrj==='all'?'All Projects Overview':'Project: '+(p?p.name:'');
+  renderDash();updateBadges();updateSbar();
+  if(APP.page!=='dashboard')navTo(APP.page)
+}
+function getPrj(id){return D.projects.find(p=>p.id===id)}
+function getPrjName(id){const p=getPrj(id);return p?p.name:id||'—'}
+function getActPrjs(){return APP.activePrj==='all'?D.projects:D.projects.filter(p=>p.id===APP.activePrj)}
+
+// ── Populate Selects ─────────────────────────────────────────
+function popSel(id,items,ph='— All —'){const s=document.getElementById(id);if(!s)return;const cur=s.value;s.innerHTML=`<option value="">${ph}</option>`;items.forEach(i=>{const o=document.createElement('option');o.value=i;o.textContent=i;s.appendChild(o)});if(cur)s.value=cur}
+function popSelO(id,items,vk,lk,ph='— All —'){const s=document.getElementById(id);if(!s)return;const cur=s.value;s.innerHTML=`<option value="">${ph}</option>`;items.forEach(i=>{const o=document.createElement('option');o.value=i[vk];o.textContent=i[lk];s.appendChild(o)});if(cur)s.value=cur}
+
+function populateAllFilters(){populateProjFilters();populateMsFilters();populateTkFilters();populateRkFilters();populateCalFilters();populateTlFilters()}
+function populateProjFilters(){popSel('pf-status',CFG.projectStatuses,'All Statuses');popSel('pf-health',CFG.projectHealth,'All Health')}
+function populateMsFilters(){
+  const prjs=D.projects.map(p=>({id:p.id,nm:(p.code?'['+p.code+'] ':'')+p.name}));
+  popSelO('mf-proj',prjs,'id','nm','All Projects');popSel('mf-phase',CFG.phases,'All Phases');
+  popSel('mf-status',CFG.milestoneStatuses,'All Statuses');popSel('mf-health',CFG.projectHealth,'All Health');
+  popSel('mf-owner',[...new Set(D.milestones.map(m=>m.owner).filter(Boolean))],'All Owners')
+}
+function populateTkFilters(){
+  const prjs=D.projects.map(p=>({id:p.id,nm:(p.code?'['+p.code+'] ':'')+p.name}));
+  popSelO('tkf-proj',prjs,'id','nm','All Projects');popSel('tkf-phase',CFG.phases,'All Phases');
+  popSelO('tkf-ms',D.milestones,'id','name','All Milestones');
+  popSel('tkf-status',CFG.taskStatuses,'All Statuses');popSel('tkf-pri',CFG.taskPriorities,'All Priorities');
+  popSel('tkf-owner',[...new Set(D.tasks.map(t=>t.owner).filter(Boolean))],'All Owners');
+  popSel('bk-status',CFG.taskStatuses,'— No Change —');
+  const ao=[...new Set([...CFG.owners,...D.tasks.map(t=>t.owner).filter(Boolean)])];
+  popSel('bk-owner',ao,'— No Change —');popSel('bk-pri',CFG.taskPriorities,'— No Change —')
+}
+function populateRkFilters(){
+  const prjs=D.projects.map(p=>({id:p.id,nm:(p.code?'['+p.code+'] ':'')+p.name}));
+  popSelO('rf-proj',prjs,'id','nm','All Projects');
+  popSel('rf-status',CFG.riskStatuses,'All Statuses');
+  popSel('rf-pri',['Low','Medium','High','Critical'],'All Priorities');
+  popSel('rf-owner',[...new Set(D.risks.map(r=>r.owner).filter(Boolean))],'All Owners')
+}
+function populateCalFilters(){const prjs=D.projects.map(p=>({id:p.id,nm:(p.code?'['+p.code+'] ':'')+p.name}));popSelO('calf-proj',prjs,'id','nm','All Projects')}
+function populateTlFilters(){
+  const prjs=D.projects.map(p=>({id:p.id,nm:(p.code?'['+p.code+'] ':'')+p.name}));
+  popSelO('tf-proj',prjs,'id','nm','All Projects');popSel('tf-phase',CFG.phases,'All Phases');
+  const ow=[...new Set([...D.milestones.map(m=>m.owner),...D.tasks.map(t=>t.owner)].filter(Boolean))];
+  popSel('tf-owner',ow,'All Owners')
+}
+function populateModalSelects(){
+  const prjs=D.projects.filter(p=>p.status!=='Cancelled').map(p=>({id:p.id,nm:(p.code?'['+p.code+'] ':'')+p.name}));
+  const ow=CFG.owners;
+  // Project modal
+  popSel('pm-mgr',ow,'— Select —');popSel('pm-phase',CFG.phases,'— Select —');
+  popSel('pm-status',CFG.projectStatuses,'— Select —');popSel('pm-health',CFG.projectHealth,'— Select —');
+  // Milestone modal
+  popSelO('mm-proj',prjs,'id','nm','— Select —');popSel('mm-phase',CFG.phases,'— Select —');
+  popSel('mm-owner',ow,'— Select —');popSel('mm-status',CFG.milestoneStatuses,'— Select —');
+  popSel('mm-health',CFG.projectHealth,'— Select —');
+  // Task modal
+  popSelO('tkm-proj',prjs,'id','nm','— Select —');popSel('tkm-phase',CFG.phases,'— Select —');
+  popSel('tkm-owner',ow,'— Select —');popSel('tkm-pri',CFG.taskPriorities,'— Select —');
+  popSel('tkm-status',CFG.taskStatuses,'— Select —');popSel('tkm-health',CFG.projectHealth,'— Select —');
+  // Risk modal
+  popSelO('rkm-proj',prjs,'id','nm','— Select —');popSel('rkm-phase',CFG.phases,'— Select —');
+  popSel('rkm-owner',ow,'— Select —');popSel('rkm-pri',['Low','Medium','High','Critical'],'— Select —');
+  popSel('rkm-status',CFG.riskStatuses,'— Select —');
+  // Quick task
+  popSelO('qt-proj',prjs,'id','nm','— Select —');popSel('qt-owner',ow,'— None —');
+  popSel('qt-pri',CFG.taskPriorities,'Medium')
+}
+
+// ── Badges & Status Bar ──────────────────────────────────────
+function updateBadges(){
+  const pid=APP.activePrj;
+  const tasks=pid==='all'?D.tasks:D.tasks.filter(t=>t.project===pid);
+  const risks=pid==='all'?D.risks:D.risks.filter(r=>r.project===pid);
+  const od=tasks.filter(t=>isOD(t.due,t.status)).length;
+  const hr=risks.filter(r=>['Open','In Progress'].includes(r.status)&&['High','Critical'].includes(r.priority)).length;
+  const ob=document.getElementById('odBadge');ob.textContent=od;ob.classList.toggle('hidden',od===0);
+  const rb=document.getElementById('rkBadge');rb.textContent=hr;rb.classList.toggle('hidden',hr===0)
+}
+function updateSbar(){
+  const pid=APP.activePrj;const tasks=pid==='all'?D.tasks:D.tasks.filter(t=>t.project===pid);
+  const od=tasks.filter(t=>isOD(t.due,t.status)).length;
+  const p=pid!=='all'?getPrj(pid):null;
+  document.getElementById('sb-proj').textContent=p?p.name:'All Projects';
+  document.getElementById('sb-tasks').textContent=tasks.length+' tasks';
+  document.getElementById('sb-od').textContent=od+' overdue'
+}
+
+// ── HTML Escape ───────────────────────────────────────────────
+function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ── Status Badge ─────────────────────────────────────────────
+function badge(val,type){
+  if(!val)return '<span class="badge b-gy">—</span>';
+  const maps={
+    project:{Active:'b-gr','Not Started':'b-gy','On Hold':'b-am',Completed:'b-te',Cancelled:'b-gy'},
+    health:{Green:'b-gr',Amber:'b-am',Red:'b-re'},
+    milestone:{'Not Started':'b-gy','In Progress':'b-bl',Completed:'b-gr',Delayed:'b-re','At Risk':'b-am',Cancelled:'b-gy'},
+    task:{'Not Started':'b-gy','In Progress':'b-bl',Blocked:'b-am',Done:'b-gr',Cancelled:'b-gy'},
+    priority:{Low:'b-te',Medium:'b-bl',High:'b-am',Critical:'b-re'},
+    risk:{Open:'b-re','In Progress':'b-am',Closed:'b-gr',Deferred:'b-gy',Cancelled:'b-gy'}
+  };
+  const cls=(maps[type]||{})[val]||'b-gy';
+  return `<span class="badge ${cls}">${esc(val)}</span>`
+}
+
+// ── Empty State ───────────────────────────────────────────────
+function emptyHTML(ico,ttl,desc){return `<div class="empty"><div class="empty-ico">${ico}</div><div class="empty-ttl">${ttl}</div><div class="empty-desc">${desc}</div></div>`}
+
+// ── Calc Project Completion ──────────────────────────────────
+function calcPrjComp(p){const t=D.tasks.filter(x=>x.project===p.id&&x.status!=='Cancelled');if(!t.length)return parseInt(p.completion)||0;return Math.round(t.reduce((s,x)=>s+(parseInt(x.pct)||0),0)/t.length)}
+function calcMsComp(m){const t=D.tasks.filter(x=>x.milestone===m.id&&x.status!=='Cancelled');if(!t.length)return parseInt(m.pct)||0;return Math.round(t.reduce((s,x)=>s+(parseInt(x.pct)||0),0)/t.length)}
+
+// ── Audit ─────────────────────────────────────────────────────
+function addAudit(mod,id,action,oldv,newv,user){
+  D.audit.unshift({id:gid(),module:mod,recordId:id,action,oldValue:oldv,newValue:newv,user:user||APP.curUser.name,timestamp:new Date().toISOString()});
+  if(D.audit.length>2000)D.audit=D.audit.slice(0,2000);
+  sv('audit',D.audit)
+}
+
+// ── Comments ─────────────────────────────────────────────────
+function renderComments(mod,id){
+  const items=D.audit.filter(a=>a.module===mod&&a.recordId===id&&a.action==='Comment');
+  if(!items.length)return '<div style="font-size:11px;color:var(--text-muted);padding:8px 0">No comments yet.</div>';
+  return items.map(c=>`<div class="cmt-item"><div class="cmt-av">${(c.user||'?').substr(0,2).toUpperCase()}</div><div><div style="display:flex;align-items:center;gap:7px"><span class="cmt-auth">${esc(c.user)}</span><span class="cmt-date">${fmtD(c.timestamp?c.timestamp.split('T')[0]:'')}</span></div><div class="cmt-txt">${esc(c.newValue)}</div></div></div>`).join('')
+}
+function quickAddComment(mod,id){
+  const inp=document.getElementById('qc-input');
+  const txt=inp?inp.value.trim():'';
+  if(!txt){toast('Enter a comment','warning');return}
+  addAudit(mod,id,'Comment',null,txt,APP.curUser.name);
+  inp.value='';
+  // re-render comments section if visible
+  const el=document.getElementById('cmt-section');
+  if(el)el.innerHTML=renderComments(mod,id);
+  toast('Comment added')
+}
+
+// ── GROUP BY ─────────────────────────────────────────────────
+function groupBy(arr,key){return arr.reduce((a,i)=>{const k=i[key]||'Unassigned';a[k]=(a[k]||0)+1;return a},{})}
+
+// ── Chart Render ─────────────────────────────────────────────
+const CHART_COLS=['var(--blue)','var(--green)','var(--amber)','var(--red)','var(--purple)','var(--teal)','#ff7043','#f48fb1'];
+function renderChart(grp,order){
+  const total=Object.values(grp).reduce((s,v)=>s+v,0);
+  if(!total)return emptyHTML('📊','No data','No data available for this chart.');
+  const keys=order?order.filter(k=>grp[k]>0):Object.keys(grp).filter(k=>grp[k]>0);
+  if(!keys.length)return emptyHTML('📊','No data','No data available.');
+  return`<div class="chart-rows">`+keys.map((k,i)=>{const v=grp[k]||0;const pct=total?Math.round(v/total*100):0;return`<div class="chart-row"><div class="chart-lbl" title="${k}">${esc(k)}</div><div class="chart-track"><div class="chart-fill" style="width:${pct}%;background:${CHART_COLS[i%CHART_COLS.length]}">${v>0?v:''}</div></div><div class="chart-val">${v}</div></div>`}).join('')+`</div>`
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function switchDashTab(tab,el){
+  APP.dashTab=tab;
+  document.querySelectorAll('#page-dashboard .tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');renderDash()
+}
+function renderDash(){
+  const body=document.getElementById('dash-body');
+  const pid=APP.activePrj;
+  const aP=pid==='all'?D.projects:D.projects.filter(p=>p.id===pid);
+  const aM=pid==='all'?D.milestones:D.milestones.filter(m=>m.project===pid);
+  const aT=pid==='all'?D.tasks:D.tasks.filter(t=>t.project===pid);
+  const aR=pid==='all'?D.risks:D.risks.filter(r=>r.project===pid);
+  const odT=aT.filter(t=>isOD(t.due,t.status));
+  const blkT=aT.filter(t=>t.status==='Blocked');
+  const openT=aT.filter(t=>!['Done','Cancelled'].includes(t.status));
+  const doneT=aT.filter(t=>t.status==='Done');
+  const odM=aM.filter(m=>isOD(m.due,m.status));
+  const compM=aM.filter(m=>m.status==='Completed');
+  const crRisks=aR.filter(r=>['Open','In Progress'].includes(r.status)&&['High','Critical'].includes(r.priority));
+  const dueWk=aT.filter(t=>isDTW(t.due)&&!['Done','Cancelled'].includes(t.status));
+  const avgC=aT.length?Math.round(aT.reduce((s,t)=>s+(parseInt(t.pct)||0),0)/aT.length):0;
+  switch(APP.dashTab){
+    case 'exec':body.innerHTML=dashExec(aP,aM,aT,aR,odT,blkT,openT,doneT,odM,compM,crRisks,dueWk,avgC);break;
+    case 'delivery':body.innerHTML=dashDelivery(aT,aM,odT,dueWk,avgC);break;
+    case 'risk':body.innerHTML=dashRisk(aR,odT,blkT,odM,aT);break;
+    case 'analysis':body.innerHTML=dashAnalysis(aP,aT,aM,aR);break;
+  }
+}
+function sc(lbl,val,sub,acc,fn=''){return`<div class="scard ${acc}" ${fn?`onclick="${fn}"`:''}><div class="sacc"></div><div class="slbl">${lbl}</div><div class="sval">${val}</div>${sub?`<div class="ssub">${sub}</div>`:''}</div>`}
+function dashExec(aP,aM,aT,aR,odT,blkT,openT,doneT,odM,compM,crRisks,dueWk,avgC){
+  const actP=aP.filter(p=>p.status==='Active');
+  let healthRows=aP.map(p=>{const pc=calcPrjComp(p);return`<tr><td><span class="clink" onclick="openPrjDetail('${p.id}')">${esc(p.name)}</span></td><td style="font-size:11px">${p.customer||'—'}</td><td>${badge(p.status,'project')}</td><td><span class="hdot ${p.health==='Green'?'hg':p.health==='Amber'?'ha':'hr2'}"></span>${p.health||'—'}</td><td><div style="display:flex;align-items:center;gap:5px"><div class="pbar" style="width:70px"><div class="pfill ${pc>=100?'done':''}" style="width:${pc}%"></div></div><span style="font-size:10px">${pc}%</span></div></td><td>${fmtD(p.end)}</td></tr>`}).join('');
+  if(!healthRows)healthRows='<tr><td colspan="6" class="tc tmuted" style="padding:18px">No projects found</td></tr>';
+  const riskRows=crRisks.slice(0,5).map(r=>`<div class="rc rc${(r.priority||'').toLowerCase()}"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px"><strong style="font-size:12px">${esc(r.title)}</strong>${badge(r.priority,'priority')}</div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="badge b-gy">${r.type}</span>${badge(r.status,'risk')}<span class="tsm tmuted">Owner: ${r.owner||'—'}</span>${r.due?`<span class="tsm ${isOD(r.due,r.status)?'od-text':''}">Due: ${fmtD(r.due)}</span>`:''}</div></div>`).join('');
+  return`<div class="sgrid" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">${sc('Total Projects',aP.length,'','ab')}${sc('Active',actP.length,'','ag')}${sc('Avg Completion',avgC+'%','all tasks','at')}${sc('Total Milestones',aM.length,compM.length+' completed','ab')}${sc('Overdue Milestones',odM.length,'',odM.length>0?'ar':'ag')}${sc('Open Tasks',openT.length,doneT.length+' done','ab')}${sc('Overdue Tasks',odT.length,'',odT.length>0?'ar':'ag')}${sc('Blocked Tasks',blkT.length,'',blkT.length>0?'aa':'ag')}${sc('High/Critical Risks',crRisks.length,'',crRisks.length>0?'ar':'ag')}${sc('Due This Week',dueWk.length,'tasks',dueWk.length>5?'aa':'ab')}</div>
+<div class="g2 mb16"><div class="card"><div class="card-hdr"><div class="card-ttl">Project Health Overview</div></div><div style="overflow-x:auto"><table><thead><tr><th>Project</th><th>Customer</th><th>Status</th><th>Health</th><th>Progress</th><th>Target</th></tr></thead><tbody>${healthRows}</tbody></table></div></div><div class="card"><div class="card-hdr"><div class="card-ttl">Task Status Distribution</div></div><div class="card-body">${renderChart(groupBy(aT,'status'),CFG.taskStatuses)}</div></div></div>${crRisks.length?`<div class="card mb16"><div class="card-hdr"><div class="card-ttl">⚠️ High/Critical Risks & Issues</div><span class="clink" onclick="navTo('risks')">View All</span></div><div class="card-body">${riskRows}</div></div>`:''}`
+}
+function dashDelivery(aT,aM,odT,dueWk,avgC){
+  const s=sowDate();const isWk=d=>{const pd=pDate(d);return pd&&pd>=s&&pd<=new Date()};
+  const compWk=aT.filter(t=>t.status==='Done'&&isWk(t.actualCompletion||t.due));
+  const newWk=aT.filter(t=>isWk(t.created));
+  const msWk=aM.filter(m=>m.status==='Completed'&&isWk(m.actualDate||m.due));
+  const dt=aT.filter(t=>isDT(t.due)&&!['Done','Cancelled'].includes(t.status));
+  const odRows=odT.slice(0,10).map(t=>`<tr><td><span class="clink" onclick="openTkDetail('${t.id}')">${esc(t.name)}</span></td><td class="od-text">${fmtD(t.due)}</td><td>${t.owner||'—'}</td><td>${badge(t.priority,'priority')}</td></tr>`).join('');
+  return`<div class="sgrid">${sc('Completed This Week',compWk.length,'tasks','ag')}${sc('Milestones Done',msWk.length,'this week','at')}${sc('New Tasks Added',newWk.length,'this week','ab')}${sc('Net Change',newWk.length-compWk.length,'this week',newWk.length>compWk.length?'aa':'ag')}${sc('Due Today',dt.length,'',dt.length>0?'aa':'ag')}${sc('Due This Week',dueWk.length,'',dueWk.length>0?'aa':'ab')}${sc('Overdue Tasks',odT.length,'',odT.length>0?'ar':'ag')}${sc('Avg Completion',avgC+'%','','at')}</div>
+<div class="g2"><div class="card"><div class="card-hdr"><div class="card-ttl">Due Today (${dt.length})</div></div>${dt.length?`<div style="overflow-x:auto;max-height:240px"><table><thead><tr><th>Task</th><th>Owner</th><th>Priority</th></tr></thead><tbody>${dt.map(t=>`<tr><td><span class="clink" onclick="openTkDetail('${t.id}')">${esc(t.name)}</span></td><td>${t.owner||'—'}</td><td>${badge(t.priority,'priority')}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty" style="padding:28px"><div class="empty-ttl">All clear!</div></div>'}</div><div class="card"><div class="card-hdr"><div class="card-ttl">Overdue Tasks (${odT.length})</div></div>${odT.length?`<div style="overflow-x:auto;max-height:240px"><table><thead><tr><th>Task</th><th>Due</th><th>Owner</th><th>Priority</th></tr></thead><tbody>${odRows}</tbody></table></div>`:'<div class="empty" style="padding:28px"><div class="empty-ttl">No overdue tasks!</div></div>'}</div></div>`
+}
+function dashRisk(aR,odT,blkT,odM,aT){
+  const openRk=aR.filter(r=>r.type==='Risk'&&['Open','In Progress'].includes(r.status));
+  const openIs=aR.filter(r=>r.type==='Issue'&&['Open','In Progress'].includes(r.status));
+  const odR=aR.filter(r=>isOD(r.due,r.status));
+  const noOwT=aT.filter(t=>!t.owner&&!['Done','Cancelled'].includes(t.status));
+  const noOwM=D.milestones.filter(m=>!m.owner&&!['Completed','Cancelled'].includes(m.status));
+  return`<div class="sgrid">${sc('Open Risks',openRk.length,'',openRk.length>0?'ar':'ag')}${sc('Open Issues',openIs.length,'',openIs.length>0?'aa':'ag')}${sc('Overdue Risks/Issues',odR.length,'',odR.length>0?'ar':'ag')}${sc('Blocked Tasks',blkT.length,'',blkT.length>0?'aa':'ag')}${sc('Overdue Tasks',odT.length,'',odT.length>0?'ar':'ag')}${sc('Delayed Milestones',odM.length,'',odM.length>0?'ar':'ag')}${sc('Tasks w/o Owner',noOwT.length,'',noOwT.length>0?'aa':'ag')}${sc('Milestones w/o Owner',noOwM.length,'',noOwM.length>0?'aa':'ag')}</div>
+<div class="g2"><div class="card"><div class="card-hdr"><div class="card-ttl">Open Risks (${openRk.length})</div><span class="clink" onclick="navTo('risks')">Manage</span></div><div class="card-body" style="max-height:260px;overflow-y:auto">${openRk.length?openRk.slice(0,8).map(r=>`<div class="rc rc${(r.priority||'').toLowerCase()}"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><strong style="font-size:11px">${esc(r.title)}</strong>${badge(r.priority,'priority')}</div><div style="font-size:10px;color:var(--text-muted)">Owner: ${r.owner||'—'}${r.due?' · Due: '+fmtD(r.due):''}</div></div>`).join(''):emptyHTML('✓','No open risks','')}</div></div><div class="card"><div class="card-hdr"><div class="card-ttl">Open Issues (${openIs.length})</div><span class="clink" onclick="navTo('risks')">Manage</span></div><div class="card-body" style="max-height:260px;overflow-y:auto">${openIs.length?openIs.slice(0,8).map(r=>`<div class="rc rc${(r.priority||'').toLowerCase()}"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><strong style="font-size:11px">${esc(r.title)}</strong>${badge(r.priority,'priority')}</div><div style="font-size:10px;color:var(--text-muted)">Owner: ${r.owner||'—'}${r.due?' · Due: '+fmtD(r.due):''}</div></div>`).join(''):emptyHTML('✓','No open issues','')}</div></div></div>`
+}
+function dashAnalysis(aP,aT,aM,aR){
+  const tByS=groupBy(aT,'status'),tByP=groupBy(aT,'priority');
+  const tByO=groupBy(aT.filter(t=>!['Done','Cancelled'].includes(t.status)),'owner');
+  const mByS=groupBy(aM,'status');
+  const rByI=groupBy(aR.filter(r=>r.type==='Risk'),'impact');
+  const pByS=groupBy(aP,'status');
+  const odByO=groupBy(aT.filter(t=>isOD(t.due,t.status)),'owner');
+  return`<div class="g2 mb16"><div class="card"><div class="card-hdr"><div class="card-ttl">Tasks by Status</div></div><div class="card-body">${renderChart(tByS,CFG.taskStatuses)}</div></div><div class="card"><div class="card-hdr"><div class="card-ttl">Tasks by Priority</div></div><div class="card-body">${renderChart(tByP,CFG.taskPriorities)}</div></div></div><div class="g2 mb16"><div class="card"><div class="card-hdr"><div class="card-ttl">Open Workload by Owner</div></div><div class="card-body">${renderChart(tByO,Object.keys(tByO))}</div></div><div class="card"><div class="card-hdr"><div class="card-ttl">Milestones by Status</div></div><div class="card-body">${renderChart(mByS,CFG.milestoneStatuses)}</div></div></div><div class="g2"><div class="card"><div class="card-hdr"><div class="card-ttl">Risks by Impact</div></div><div class="card-body">${renderChart(rByI,['Low','Medium','High','Critical'])}</div></div><div class="card"><div class="card-hdr"><div class="card-ttl">Projects by Status</div></div><div class="card-body">${renderChart(pByS,CFG.projectStatuses)}</div></div></div>`
+}
+
+// ============================================================
+// PROJECTS
+// ============================================================
+function renderProjects(){
+  const body=document.getElementById('proj-body');
+  let pr=[...D.projects];
+  const fS=document.getElementById('pf-status').value;
+  const fH=document.getElementById('pf-health').value;
+  const fSe=document.getElementById('pf-search').value.toLowerCase();
+  if(fS)pr=pr.filter(p=>p.status===fS);
+  if(fH)pr=pr.filter(p=>p.health===fH);
+  if(fSe)pr=pr.filter(p=>(p.name+p.customer+p.code).toLowerCase().includes(fSe));
+  document.getElementById('proj-sub').textContent=pr.length+' project(s)';
+  if(!pr.length){body.innerHTML=emptyHTML('📁','No Projects','Create your first project to get started.');return}
+  if(APP.prjView==='grid'){
+    body.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">${pr.map(p=>prjCard(p)).join('')}</div>`;return
+  }
+  body.innerHTML=`<div class="twrap"><table><thead><tr><th>Project</th><th>Code</th><th>Customer</th><th>PM</th><th>Phase</th><th>Status</th><th>Health</th><th>Progress</th><th>Target</th><th>Actions</th></tr></thead><tbody>${pr.map(p=>{const pc=calcPrjComp(p);return`<tr><td><strong class="clink" onclick="openPrjDetail('${p.id}')">${esc(p.name)}</strong></td><td class="mono">${p.code||'—'}</td><td>${p.customer||'—'}</td><td>${p.manager||'—'}</td><td>${p.phase?`<span class="badge b-bl">${esc(p.phase)}</span>`:'—'}</td><td>${badge(p.status,'project')}</td><td><span class="hdot ${p.health==='Green'?'hg':p.health==='Amber'?'ha':'hr2'}"></span>${p.health||'—'}</td><td><div style="display:flex;align-items:center;gap:5px"><div class="pbar" style="width:64px"><div class="pfill ${pc>=100?'done':''}" style="width:${pc}%"></div></div><span style="font-size:10px">${pc}%</span></div></td><td>${fmtD(p.end)}</td><td><div class="flex gap6"><button class="btn btn-s btn-xs" onclick="openProjModal('${p.id}')">Edit</button><button class="btn btn-d btn-xs" onclick="delProject('${p.id}')">Del</button></div></td></tr>`}).join('')}</tbody></table></div>`
+}
+function prjCard(p){
+  const pc=calcPrjComp(p);const tasks=D.tasks.filter(t=>t.project===p.id);const od=tasks.filter(t=>isOD(t.due,t.status)).length;
+  return`<div class="card" style="cursor:pointer" onclick="openPrjDetail('${p.id}')"><div style="padding:12px 14px 9px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:14px;font-weight:700;margin-bottom:2px">${esc(p.name)}</div><div style="font-size:10px;color:var(--text-muted)">${p.code||''} ${p.code&&p.customer?'·':''} ${p.customer||''}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">${badge(p.status,'project')}<span class="hdot ${p.health==='Green'?'hg':p.health==='Amber'?'ha':'hr2'}" style="width:11px;height:11px"></span></div></div><div style="padding:10px 14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><span style="font-size:11px;color:var(--text-secondary)">Completion</span><span style="font-size:12px;font-weight:700;font-family:var(--font-mono)">${pc}%</span></div><div class="pbar mb12"><div class="pfill ${pc>=100?'done':pc<30&&od>0?'od':''}" style="width:${pc}%"></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;font-size:11px"><div><span style="color:var(--text-muted)">Phase: </span>${p.phase||'—'}</div><div><span style="color:var(--text-muted)">PM: </span>${p.manager||'—'}</div><div><span style="color:var(--text-muted)">Tasks: </span>${tasks.length}</div><div ${od>0?'class="od-text"':''}><span style="color:var(--text-muted)">Overdue: </span>${od}</div></div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:var(--text-muted)">Target: ${fmtD(p.end)}</span><div class="flex gap6" onclick="event.stopPropagation()"><button class="btn btn-s btn-xs" onclick="openProjModal('${p.id}')">Edit</button><button class="btn btn-g btn-xs" onclick="dupProject('${p.id}')">Copy</button><button class="btn btn-d btn-xs" onclick="delProject('${p.id}')">Del</button></div></div></div></div>`
+}
+function setProjectView(v,el){APP.prjView=v;document.querySelectorAll('#page-projects .vbtn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderProjects()}
+function clearProjFilters(){['pf-status','pf-health'].forEach(id=>document.getElementById(id).value='');document.getElementById('pf-search').value='';renderProjects()}
+
+function openProjModal(id){
+  populateModalSelects();APP.editId=id||null;
+  document.getElementById('pm-title').textContent=id?'Edit Project':'New Project';
+  const ids=['pm-name','pm-code','pm-customer','pm-mgr','pm-sponsor','pm-phase','pm-start','pm-end','pm-aend','pm-status','pm-health','pm-dteam','pm-cteam','pm-desc','pm-scope','pm-notes'];
+  ids.forEach(f=>{const e=document.getElementById(f);if(e)e.value=''});
+  if(id){const p=D.projects.find(x=>x.id===id);if(p){
+    document.getElementById('pm-name').value=p.name||'';document.getElementById('pm-code').value=p.code||'';
+    document.getElementById('pm-customer').value=p.customer||'';document.getElementById('pm-mgr').value=p.manager||'';
+    document.getElementById('pm-sponsor').value=p.sponsor||'';document.getElementById('pm-phase').value=p.phase||'';
+    document.getElementById('pm-start').value=p.start||'';document.getElementById('pm-end').value=p.end||'';
+    document.getElementById('pm-aend').value=p.actualEnd||'';document.getElementById('pm-status').value=p.status||'';
+    document.getElementById('pm-health').value=p.health||'';document.getElementById('pm-dteam').value=p.deliveryTeam||'';
+    document.getElementById('pm-cteam').value=p.customerTeam||'';document.getElementById('pm-desc').value=p.description||'';
+    document.getElementById('pm-scope').value=p.scope||'';document.getElementById('pm-notes').value=p.notes||''
+  }}
+  openModal('proj-modal')
+}
+function saveProject(){
+  const name=document.getElementById('pm-name').value.trim();
+  if(!name){toast('Project name required','error');document.getElementById('pm-name').classList.add('inp-err');return}
+  document.getElementById('pm-name').classList.remove('inp-err');
+  const now=new Date().toISOString();
+  const p={id:APP.editId||gid(),name,code:document.getElementById('pm-code').value.trim(),customer:document.getElementById('pm-customer').value.trim(),manager:document.getElementById('pm-mgr').value,sponsor:document.getElementById('pm-sponsor').value.trim(),phase:document.getElementById('pm-phase').value,start:document.getElementById('pm-start').value,end:document.getElementById('pm-end').value,actualEnd:document.getElementById('pm-aend').value,status:document.getElementById('pm-status').value||'Active',health:document.getElementById('pm-health').value||'Green',deliveryTeam:document.getElementById('pm-dteam').value,customerTeam:document.getElementById('pm-cteam').value,description:document.getElementById('pm-desc').value,scope:document.getElementById('pm-scope').value,notes:document.getElementById('pm-notes').value,updated:now};
+  const isNew=!APP.editId;
+  if(isNew){p.created=now;D.projects.push(p)}else{const i=D.projects.findIndex(x=>x.id===p.id);if(i>=0)D.projects[i]=p}
+  sv('projects',D.projects);addAudit('Project',p.id,isNew?'Created':'Updated',null,p.name,APP.curUser.name);
+  populateProjSel();populateAllFilters();closeModal('proj-modal');renderProjects();renderDash();updateBadges();
+  toast(isNew?'Project created':'Project updated','success')
+}
+function delProject(id){
+  const p=D.projects.find(x=>x.id===id);if(!p)return;
+  showConfirm('Delete Project',`Delete "${p.name}"? All milestones, tasks, and risks will also be deleted.`,()=>{
+    D.projects=D.projects.filter(x=>x.id!==id);
+    D.milestones=D.milestones.filter(m=>m.project!==id);
+    D.tasks=D.tasks.filter(t=>t.project!==id);
+    D.risks=D.risks.filter(r=>r.project!==id);
+    sv('projects',D.projects);sv('milestones',D.milestones);sv('tasks',D.tasks);sv('risks',D.risks);
+    addAudit('Project',id,'Deleted',p.name,null,APP.curUser.name);
+    populateProjSel();populateAllFilters();renderProjects();renderDash();updateBadges();toast('Project deleted')
+  },'🗑️')
+}
+function dupProject(id){
+  const p=D.projects.find(x=>x.id===id);if(!p)return;
+  const np={...p,id:gid(),name:'Copy of '+p.name,created:new Date().toISOString(),status:'Not Started'};
+  D.projects.push(np);sv('projects',D.projects);addAudit('Project',np.id,'Created',null,np.name,APP.curUser.name);
+  populateProjSel();renderProjects();toast('Project duplicated','success')
+}
+function openPrjDetail(id){
+  const p=D.projects.find(x=>x.id===id);if(!p)return;
+  const pc=calcPrjComp(p);const tasks=D.tasks.filter(t=>t.project===id);const od=tasks.filter(t=>isOD(t.due,t.status));
+  document.getElementById('det-title').textContent=p.name;
+  document.getElementById('det-body').innerHTML=`<div class="g2 mb12"><div>${[['Code',p.code||'—'],['Customer',p.customer||'—'],['PM',p.manager||'—'],['Sponsor',p.sponsor||'—'],['Status',badge(p.status,'project')],['Health',`<span class="hdot ${p.health==='Green'?'hg':p.health==='Amber'?'ha':'hr2'}"></span>${p.health||'—'}`]].map(([l,v])=>`<div class="df"><div class="df-lbl">${l}</div><div class="df-val">${v}</div></div>`).join('')}</div><div>${[['Phase',p.phase||'—'],['Start',fmtD(p.start)],['Target End',fmtD(p.end)],['Tasks',tasks.length+' total, '+od.length+' overdue'],['Milestones',D.milestones.filter(m=>m.project===id).length+' total'],['Progress',`<div style="display:flex;align-items:center;gap:6px"><div class="pbar flex1"><div class="pfill" style="width:${pc}%"></div></div><strong>${pc}%</strong></div>`]].map(([l,v])=>`<div class="df"><div class="df-lbl">${l}</div><div class="df-val">${v}</div></div>`).join('')}</div></div>${p.description?`<div class="df"><div class="df-lbl">Description</div><div class="df-val">${esc(p.description)}</div></div>`:''} ${p.scope?`<div class="df"><div class="df-lbl">Contracted Scope</div><div class="df-val">${esc(p.scope)}</div></div>`:''} ${p.notes?`<div class="df"><div class="df-lbl">Notes</div><div class="df-val">${esc(p.notes)}</div></div>`:''}`;
+  document.getElementById('det-foot').innerHTML=`<button class="btn btn-s" onclick="closeModal('detail-modal')">Close</button><button class="btn btn-p" onclick="closeModal('detail-modal');openProjModal('${id}')">Edit</button>`;
+  openModal('detail-modal')
+}
+
+// ============================================================
+// MILESTONES
+// ============================================================
+function renderMilestones(){
+  const body=document.getElementById('ms-body');let ms=filteredMs();
+  document.getElementById('ms-sub').textContent=ms.length+' milestone(s)';
+  if(!ms.length){body.innerHTML='<div style="padding:20px">'+emptyHTML('🏁','No Milestones','Add a milestone to start tracking.')+'</div>';return}
+  if(APP.msView==='cards'){body.innerHTML=`<div style="padding:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:12px">${ms.map(m=>msCard(m)).join('')}</div>`;return}
+  body.innerHTML=`<div style="padding:18px"><div class="twrap"><table><thead><tr><th>Milestone</th><th>Project</th><th>Phase</th><th>Owner</th><th>Status</th><th>Health</th><th>Due Date</th><th>Progress</th><th>Actions</th></tr></thead><tbody>${ms.map(m=>{const pc=calcMsComp(m);const od=isOD(m.due,m.status);return`<tr ${od?'style="background:var(--red-bg)"':''}><td><strong class="clink" onclick="openMsDetail('${m.id}')">${esc(m.name)}</strong>${od?'<span class="badge b-re" style="margin-left:4px">Overdue</span>':''}</td><td style="font-size:11px">${getPrjName(m.project)}</td><td>${m.phase?`<span class="badge b-bl">${esc(m.phase)}</span>`:'—'}</td><td>${m.owner||'—'}</td><td>${badge(m.status,'milestone')}</td><td><span class="hdot ${m.health==='Green'?'hg':m.health==='Amber'?'ha':'hr2'}"></span>${m.health||'—'}</td><td class="${od?'od-text':''}">${fmtD(m.due)}</td><td><div style="display:flex;align-items:center;gap:4px"><div class="pbar" style="width:55px"><div class="pfill ${pc>=100?'done':''}" style="width:${pc}%"></div></div><span style="font-size:10px">${pc}%</span></div></td><td><div class="flex gap6"><button class="btn btn-s btn-xs" onclick="openMsModal('${m.id}')">Edit</button>${m.status!=='Completed'?`<button class="btn btn-ok btn-xs" onclick="completeMilestone('${m.id}')">✓</button>`:''}<button class="btn btn-d btn-xs" onclick="delMilestone('${m.id}')">Del</button></div></td></tr>`}).join('')}</tbody></table></div></div>`
+}
+function msCard(m){const pc=calcMsComp(m);const od=isOD(m.due,m.status);const tasks=D.tasks.filter(t=>t.milestone===m.id);return`<div class="card" style="${od?'border-left:4px solid var(--red);':''} cursor:pointer" onclick="openMsDetail('${m.id}')"><div style="padding:10px 12px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div style="font-size:12px;font-weight:600;flex:1;margin-right:7px">${esc(m.name)}</div>${badge(m.status,'milestone')}</div><div style="font-size:10px;color:var(--text-muted);margin-bottom:7px">${getPrjName(m.project)}${m.phase?' · '+m.phase:''}</div><div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px"><span>Owner: ${m.owner||'—'}</span><span class="${od?'od-text':''}">${fmtD(m.due)}</span></div><div class="pbar mb8"><div class="pfill ${pc>=100?'done':''}" style="width:${pc}%"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted)"><span>${pc}% · ${tasks.length} tasks</span>${od?'<span class="od-text">Overdue</span>':''}</div></div></div>`}
+function filteredMs(){
+  let ms=APP.activePrj!=='all'?D.milestones.filter(m=>m.project===APP.activePrj):[...D.milestones];
+  const fp=document.getElementById('mf-proj')?.value,fph=document.getElementById('mf-phase')?.value,fs=document.getElementById('mf-status')?.value,fh=document.getElementById('mf-health')?.value,fo=document.getElementById('mf-owner')?.value,fse=document.getElementById('mf-search')?.value.toLowerCase();
+  if(fp)ms=ms.filter(m=>m.project===fp);if(fph)ms=ms.filter(m=>m.phase===fph);if(fs)ms=ms.filter(m=>m.status===fs);if(fh)ms=ms.filter(m=>m.health===fh);if(fo)ms=ms.filter(m=>m.owner===fo);if(fse)ms=ms.filter(m=>(m.name+m.owner).toLowerCase().includes(fse));return ms
+}
+function setMsView(v,el){APP.msView=v;document.querySelectorAll('#page-milestones .vbtn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderMilestones()}
+function clearMsFilters(){['mf-proj','mf-phase','mf-status','mf-health','mf-owner'].forEach(id=>document.getElementById(id).value='');document.getElementById('mf-search').value='';renderMilestones()}
+function onMsProjChange(){}
+function openMsModal(id){
+  populateModalSelects();APP.editId=id||null;
+  document.getElementById('mm-title').textContent=id?'Edit Milestone':'New Milestone';
+  ['mm-name','mm-proj','mm-phase','mm-owner','mm-start','mm-due','mm-actual','mm-status','mm-health','mm-pct','mm-dep','mm-remarks'].forEach(f=>{const e=document.getElementById(f);if(e)e.value=''});
+  if(id){const m=D.milestones.find(x=>x.id===id);if(m){document.getElementById('mm-name').value=m.name||'';document.getElementById('mm-proj').value=m.project||'';document.getElementById('mm-phase').value=m.phase||'';document.getElementById('mm-owner').value=m.owner||'';document.getElementById('mm-start').value=m.start||'';document.getElementById('mm-due').value=m.due||'';document.getElementById('mm-actual').value=m.actualDate||'';document.getElementById('mm-status').value=m.status||'';document.getElementById('mm-health').value=m.health||'';document.getElementById('mm-pct').value=m.pct||'';document.getElementById('mm-dep').value=m.dependency||'';document.getElementById('mm-remarks').value=m.remarks||''}}
+  else{if(APP.activePrj!=='all')document.getElementById('mm-proj').value=APP.activePrj}
+  openModal('ms-modal')
+}
+function saveMilestone(){
+  const name=document.getElementById('mm-name').value.trim(),proj=document.getElementById('mm-proj').value;
+  if(!name){toast('Name required','error');return}if(!proj){toast('Project required','error');return}
+  const now=new Date().toISOString();
+  const m={id:APP.editId||gid(),name,project:proj,phase:document.getElementById('mm-phase').value,owner:document.getElementById('mm-owner').value,start:document.getElementById('mm-start').value,due:document.getElementById('mm-due').value,actualDate:document.getElementById('mm-actual').value,status:document.getElementById('mm-status').value||'Not Started',health:document.getElementById('mm-health').value||'Green',pct:document.getElementById('mm-pct').value||'0',dependency:document.getElementById('mm-dep').value,remarks:document.getElementById('mm-remarks').value,updated:now};
+  const isNew=!APP.editId;
+  if(isNew){m.created=now;D.milestones.push(m)}else{const i=D.milestones.findIndex(x=>x.id===m.id);if(i>=0)D.milestones[i]=m}
+  sv('milestones',D.milestones);addAudit('Milestone',m.id,isNew?'Created':'Updated',null,m.name,APP.curUser.name);
+  populateMsFilters();populateTkFilters();closeModal('ms-modal');renderMilestones();renderDash();updateBadges();
+  toast(isNew?'Milestone created':'Milestone updated','success')
+}
+function delMilestone(id){
+  const m=D.milestones.find(x=>x.id===id);if(!m)return;
+  showConfirm('Delete Milestone',`Delete "${m.name}"?`,()=>{
+    D.milestones=D.milestones.filter(x=>x.id!==id);
+    D.tasks.filter(t=>t.milestone===id).forEach(t=>t.milestone='');
+    sv('milestones',D.milestones);sv('tasks',D.tasks);
+    addAudit('Milestone',id,'Deleted',m.name,null,APP.curUser.name);
+    renderMilestones();renderDash();updateBadges();populateTkFilters();toast('Milestone deleted')
+  },'🗑️')
+}
+function completeMilestone(id){
+  const m=D.milestones.find(x=>x.id===id);if(!m)return;
+  const old=m.status;m.status='Completed';m.pct='100';m.actualDate=m.actualDate||tod();m.updated=new Date().toISOString();
+  sv('milestones',D.milestones);addAudit('Milestone',id,'Updated',old,'Completed',APP.curUser.name);
+  renderMilestones();renderDash();updateBadges();toast('Milestone completed','success')
+}
+function openMsDetail(id){
+  const m=D.milestones.find(x=>x.id===id);if(!m)return;
+  const pc=calcMsComp(m);const tasks=D.tasks.filter(t=>t.milestone===id);const od=isOD(m.due,m.status);
+  document.getElementById('det-title').textContent=m.name;
+  document.getElementById('det-body').innerHTML=`<div class="g2 mb12"><div>${[['Project',getPrjName(m.project)],['Phase',m.phase||'—'],['Owner',m.owner||'—'],['Status',badge(m.status,'milestone')],['Health',`<span class="hdot ${m.health==='Green'?'hg':m.health==='Amber'?'ha':'hr2'}"></span>${m.health||'—'}`],['Dependency',m.dependency||'—']].map(([l,v])=>`<div class="df"><div class="df-lbl">${l}</div><div class="df-val">${v}</div></div>`).join('')}</div><div>${[['Due Date',`<span class="${od?'od-text':''}">${fmtD(m.due)}</span>`],['Actual',fmtD(m.actualDate)],['Progress',`<div style="display:flex;align-items:center;gap:5px"><div class="pbar flex1"><div class="pfill ${pc>=100?'done':''}" style="width:${pc}%"></div></div><strong>${pc}%</strong></div>`],['Linked Tasks',tasks.length]].map(([l,v])=>`<div class="df"><div class="df-lbl">${l}</div><div class="df-val">${v}</div></div>`).join('')}</div></div>${m.remarks?`<div class="df"><div class="df-lbl">Remarks</div><div class="df-val">${esc(m.remarks)}</div></div>`:''}${tasks.length?`<div class="sec-lbl mt12">Linked Tasks</div><div class="twrap"><table><thead><tr><th>Task</th><th>Owner</th><th>Status</th><th>Due</th></tr></thead><tbody>${tasks.map(t=>`<tr><td>${esc(t.name)}</td><td>${t.owner||'—'}</td><td>${badge(t.status,'task')}</td><td class="${isOD(t.due,t.status)?'od-text':''}">${fmtD(t.due)}</td></tr>`).join('')}</tbody></table></div>`:''}<div class="sec-lbl mt12">Comments</div><div id="cmt-section">${renderComments('Milestone',id)}</div><div class="flex gap8 mt8"><input type="text" id="qc-input" placeholder="Add a comment…" style="flex:1"><button class="btn btn-s btn-sm" onclick="quickAddComment('Milestone','${id}')">Comment</button></div>`;
+  document.getElementById('det-foot').innerHTML=`<button class="btn btn-s" onclick="closeModal('detail-modal')">Close</button>${m.status!=='Completed'?`<button class="btn btn-ok" onclick="completeMilestone('${id}');closeModal('detail-modal')">✓ Mark Complete</button>`:''}<button class="btn btn-p" onclick="closeModal('detail-modal');openMsModal('${id}')">Edit</button>`;
+  openModal('detail-modal')
+}
+function exportMilestones(){
+  const ms=filteredMs();
+  const rows=[['ID','Name','Project','Phase','Owner','Status','Health','Due Date','Pct','Remarks']];
+  ms.forEach(m=>rows.push([m.id,m.name,getPrjName(m.project),m.phase||'',m.owner||'',m.status||'',m.health||'',m.due||'',m.pct||'0',m.remarks||'']));
+  dlCSV(rows,'milestones.csv');toast('Milestones exported')
+}
+
+// ============================================================
+// TASKS
+// ============================================================
+function renderTasks(){
+  const body=document.getElementById('tk-body');let tasks=filteredTasks();
+  document.getElementById('tk-sub').textContent=tasks.length+' task(s) · '+APP.selTasks.size+' selected';
+  document.getElementById('bulkBtn').classList.toggle('hidden',APP.selTasks.size===0);
+  if(APP.tkView==='kanban'){body.innerHTML=renderKanban(tasks);return}
+  if(!tasks.length){body.innerHTML='<div style="padding:20px">'+emptyHTML('✅','No Tasks','Add tasks or adjust your filters.')+'</div>';return}
+  body.innerHTML=`<div style="padding:18px"><div class="twrap"><table><thead><tr><th><input type="checkbox" class="tchk" id="selAll" onchange="toggleSelAll(this)"></th><th>Task</th><th>Project</th><th>Milestone</th><th>Owner</th><th>Priority</th><th>Status</th><th>Due</th><th>Progress</th><th>Actions</th></tr></thead><tbody>${tasks.map(t=>{const od=isOD(t.due,t.status);const dt=isDT(t.due)&&!['Done','Cancelled'].includes(t.status);const sel=APP.selTasks.has(t.id);return`<tr ${sel?'class="sel-row"':od?'style="background:var(--red-bg)"':dt?'style="background:var(--amber-bg)"':''}><td><input type="checkbox" class="tchk" ${sel?'checked':''} onchange="toggleTkSel('${t.id}',this)"></td><td><strong class="clink" onclick="openTkDetail('${t.id}')">${esc(t.name)}</strong>${t.riskFlag?'<span class="badge b-am" style="margin-left:3px">Risk</span>':''}${od?'<span class="badge b-re" style="margin-left:3px">OD</span>':''}${t.status==='Blocked'?'<span class="badge b-am" style="margin-left:3px">Blk</span>':''}</td><td style="font-size:10px">${getPrjName(t.project)}</td><td style="font-size:10px">${getMsName(t.milestone)}</td><td>${t.owner||'—'}</td><td>${badge(t.priority,'priority')}</td><td>${badge(t.status,'task')}</td><td class="${od?'od-text':''}">${fmtD(t.due)}</td><td><div style="display:flex;align-items:center;gap:4px"><div class="pbar" style="width:48px"><div class="pfill ${parseInt(t.pct)>=100?'done':''}" style="width:${t.pct||0}%"></div></div><span style="font-size:10px">${t.pct||0}%</span></div></td><td><div class="flex gap6"><button class="btn btn-s btn-xs" onclick="openTkModal('${t.id}')">Edit</button>${t.status!=='Done'?`<button class="btn btn-ok btn-xs" onclick="completeTask('${t.id}')">✓</button>`:''}<button class="btn btn-d btn-xs" onclick="delTask('${t.id}')">Del</button></div></td></tr>`}).join('')}</tbody></table></div></div>`
+}
+function renderKanban(tasks){
+  return`<div style="padding:18px;overflow-x:auto"><div class="kboard">${CFG.taskStatuses.map(col=>{const ct=tasks.filter(t=>t.status===col);const cc={'Not Started':'var(--text-muted)',Blocked:'var(--amber)','In Progress':'var(--blue)',Done:'var(--green)',Cancelled:'var(--text-muted)'};return`<div class="kcol"><div class="kcol-hdr" style="color:${cc[col]||'inherit'}"><span>${col}</span><span class="badge b-gy">${ct.length}</span></div><div class="kcol-body">${!ct.length?`<div style="text-align:center;padding:16px;font-size:11px;color:var(--text-muted)">Empty</div>`:''}${ct.map(t=>`<div class="kcard p${(t.priority||'').toLowerCase().charAt(0)}" onclick="openTkDetail('${t.id}')"><div class="kcard-ttl">${esc(t.name)}</div>${t.milestone?`<div style="font-size:9px;color:var(--text-muted);margin-bottom:3px">${getMsName(t.milestone)}</div>`:''}<div class="kcard-meta"><span class="kcard-owner">${t.owner||'Unassigned'}</span><span class="kcard-due ${isOD(t.due,t.status)?'od':''}">${t.due?fmtD(t.due):''}</span></div>${badge(t.priority,'priority')}</div>`).join('')}</div></div>`}).join('')}</div></div>`
+}
+function filteredTasks(){
+  let tasks=APP.activePrj!=='all'?D.tasks.filter(t=>t.project===APP.activePrj):[...D.tasks];
+  const fp=document.getElementById('tkf-proj')?.value,fph=document.getElementById('tkf-phase')?.value,fm=document.getElementById('tkf-ms')?.value,fs=document.getElementById('tkf-status')?.value,fpr=document.getElementById('tkf-pri')?.value,fo=document.getElementById('tkf-owner')?.value,fse=document.getElementById('tkf-search')?.value.toLowerCase();
+  if(fp)tasks=tasks.filter(t=>t.project===fp);if(fph)tasks=tasks.filter(t=>t.phase===fph);if(fm)tasks=tasks.filter(t=>t.milestone===fm);if(fs)tasks=tasks.filter(t=>t.status===fs);if(fpr)tasks=tasks.filter(t=>t.priority===fpr);if(fo)tasks=tasks.filter(t=>t.owner===fo);if(fse)tasks=tasks.filter(t=>(t.name+t.owner+t.description).toLowerCase().includes(fse));return tasks
+}
+function getMsName(mid){const m=D.milestones.find(x=>x.id===mid);return m?m.name:'—'}
+function applyQuickFilter(q){document.getElementById('tkf-status').value='';const body=document.getElementById('tk-body');let tasks=filteredTasks();if(q==='overdue')tasks=tasks.filter(t=>isOD(t.due,t.status));else if(q==='today')tasks=tasks.filter(t=>isDT(t.due)&&!['Done','Cancelled'].includes(t.status));else if(q==='week')tasks=tasks.filter(t=>isDTW(t.due)&&!['Done','Cancelled'].includes(t.status));else if(q==='blocked')tasks=tasks.filter(t=>t.status==='Blocked');else if(q==='noowner')tasks=tasks.filter(t=>!t.owner);document.getElementById('tk-sub').textContent=tasks.length+' task(s)';if(!tasks.length){body.innerHTML='<div style="padding:20px">'+emptyHTML('✅','No Tasks','No tasks match this filter.')+'</div>';return}body.innerHTML=`<div style="padding:18px"><div class="twrap"><table><thead><tr><th>Task</th><th>Project</th><th>Owner</th><th>Priority</th><th>Status</th><th>Due</th><th>Actions</th></tr></thead><tbody>${tasks.map(t=>`<tr><td><strong class="clink" onclick="openTkDetail('${t.id}')">${esc(t.name)}</strong></td><td style="font-size:10px">${getPrjName(t.project)}</td><td>${t.owner||'—'}</td><td>${badge(t.priority,'priority')}</td><td>${badge(t.status,'task')}</td><td class="${isOD(t.due,t.status)?'od-text':''}">${fmtD(t.due)}</td><td><div class="flex gap6"><button class="btn btn-s btn-xs" onclick="openTkModal('${t.id}')">Edit</button><button class="btn btn-d btn-xs" onclick="delTask('${t.id}')">Del</button></div></td></tr>`).join('')}</tbody></table></div></div>`}
+function setTkView(v,el){APP.tkView=v;document.querySelectorAll('#page-tasks .vbtn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderTasks()}
+function clearTkFilters(){['tkf-proj','tkf-phase','tkf-ms','tkf-status','tkf-pri','tkf-owner','tkf-quick'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});const e=document.getElementById('tkf-search');if(e)e.value='';renderTasks()}
+function toggleSelAll(cb){const tasks=filteredTasks();if(cb.checked)tasks.forEach(t=>APP.selTasks.add(t.id));else APP.selTasks.clear();renderTasks()}
+function toggleTkSel(id,cb){if(cb.checked)APP.selTasks.add(id);else APP.selTasks.delete(id);document.getElementById('bulkBtn').classList.toggle('hidden',APP.selTasks.size===0);document.getElementById('tk-sub').textContent=filteredTasks().length+' task(s) · '+APP.selTasks.size+' selected'}
+function showBulkModal(){populateTkFilters();openModal('bulk-modal')}
+function applyBulk(){
+  const ns=document.getElementById('bk-status').value,no=document.getElementById('bk-owner').value,np=document.getElementById('bk-pri').value,nd=document.getElementById('bk-due').value;
+  let cnt=0;D.tasks.forEach(t=>{if(!APP.selTasks.has(t.id))return;if(ns)t.status=ns;if(no)t.owner=no;if(np)t.priority=np;if(nd)t.due=nd;t.updated=new Date().toISOString();cnt++});
+  sv('tasks',D.tasks);addAudit('Task','bulk','Updated',null,`Bulk update on ${cnt} tasks`,APP.curUser.name);
+  APP.selTasks.clear();closeModal('bulk-modal');renderTasks();renderDash();updateBadges();updateSbar();toast(cnt+' tasks updated','success')
+}
+function onTkProjChange(){const pid=document.getElementById('tkm-proj').value;const ms=D.milestones.filter(m=>m.project===pid);popSelO('tkm-ms',ms,'id','name','— None —')}
+function openTkModal(id){
+  populateModalSelects();APP.editId=id||null;
+  document.getElementById('tkm-title').textContent=id?'Edit Task':'New Task';
+  ['tkm-name','tkm-proj','tkm-phase','tkm-ms','tkm-owner','tkm-pri','tkm-status','tkm-health','tkm-start','tkm-due','tkm-actual','tkm-pct','tkm-est','tkm-act','tkm-dep','tkm-block','tkm-desc'].forEach(f=>{const e=document.getElementById(f);if(e)e.value=''});
+  document.getElementById('tkm-risk').checked=false;
+  if(id){const t=D.tasks.find(x=>x.id===id);if(t){
+    document.getElementById('tkm-name').value=t.name||'';document.getElementById('tkm-proj').value=t.project||'';onTkProjChange();
+    document.getElementById('tkm-phase').value=t.phase||'';document.getElementById('tkm-ms').value=t.milestone||'';
+    document.getElementById('tkm-owner').value=t.owner||'';document.getElementById('tkm-pri').value=t.priority||'';
+    document.getElementById('tkm-status').value=t.status||'';document.getElementById('tkm-health').value=t.health||'';
+    document.getElementById('tkm-start').value=t.start||'';document.getElementById('tkm-due').value=t.due||'';
+    document.getElementById('tkm-actual').value=t.actualCompletion||'';document.getElementById('tkm-pct').value=t.pct||'';
+    document.getElementById('tkm-est').value=t.estEffort||'';document.getElementById('tkm-act').value=t.actEffort||'';
+    document.getElementById('tkm-dep').value=t.dependency||'';document.getElementById('tkm-block').value=t.blocking||'';
+    document.getElementById('tkm-risk').checked=!!t.riskFlag;document.getElementById('tkm-desc').value=t.description||''
+  }}else{if(APP.activePrj!=='all'){document.getElementById('tkm-proj').value=APP.activePrj;onTkProjChange()}document.getElementById('tkm-status').value='Not Started';document.getElementById('tkm-pri').value='Medium';document.getElementById('tkm-health').value='Green'}
+  openModal('tk-modal')
+}
+function saveTask(){
+  const name=document.getElementById('tkm-name').value.trim(),proj=document.getElementById('tkm-proj').value;
+  if(!name){toast('Task name required','error');return}if(!proj){toast('Project required','error');return}
+  const now=new Date().toISOString();
+  const t={id:APP.editId||gid(),name,project:proj,phase:document.getElementById('tkm-phase').value,milestone:document.getElementById('tkm-ms').value,owner:document.getElementById('tkm-owner').value,priority:document.getElementById('tkm-pri').value||'Medium',status:document.getElementById('tkm-status').value||'Not Started',health:document.getElementById('tkm-health').value||'Green',start:document.getElementById('tkm-start').value,due:document.getElementById('tkm-due').value,actualCompletion:document.getElementById('tkm-actual').value,pct:document.getElementById('tkm-pct').value||'0',estEffort:document.getElementById('tkm-est').value,actEffort:document.getElementById('tkm-act').value,dependency:document.getElementById('tkm-dep').value,blocking:document.getElementById('tkm-block').value,riskFlag:document.getElementById('tkm-risk').checked,description:document.getElementById('tkm-desc').value,updated:now};
+  const isNew=!APP.editId;
+  if(isNew){t.created=now;D.tasks.push(t)}else{const i=D.tasks.findIndex(x=>x.id===t.id);if(i>=0)D.tasks[i]=t}
+  sv('tasks',D.tasks);addAudit('Task',t.id,isNew?'Created':'Updated',null,t.name,APP.curUser.name);
+  populateTkFilters();closeModal('tk-modal');renderTasks();renderDash();updateBadges();updateSbar();
+  toast(isNew?'Task created':'Task updated','success')
+}
+function delTask(id){
+  const t=D.tasks.find(x=>x.id===id);if(!t)return;
+  showConfirm('Delete Task',`Delete "${t.name}"?`,()=>{D.tasks=D.tasks.filter(x=>x.id!==id);sv('tasks',D.tasks);APP.selTasks.delete(id);addAudit('Task',id,'Deleted',t.name,null,APP.curUser.name);renderTasks();renderDash();updateBadges();updateSbar();toast('Task deleted')},'🗑️')
+}
+function completeTask(id){
+  const t=D.tasks.find(x=>x.id===id);if(!t)return;
+  const old=t.status;t.status='Done';t.pct='100';t.actualCompletion=t.actualCompletion||tod();t.updated=new Date().toISOString();
+  sv('tasks',D.tasks);addAudit('Task',id,'Updated',old,'Done',APP.curUser.name);renderTasks();renderDash();updateBadges();updateSbar();toast('Task marked Done','success')
+}
+function openTkDetail(id){
+  const t=D.tasks.find(x=>x.id===id);if(!t)return;
+  const od=isOD(t.due,t.status);
+  document.getElementById('det-title').textContent=t.name;
+  document.getElementById('det-body').innerHTML=`<div class="g2 mb12"><div>${[['Project',getPrjName(t.project)],['Phase',t.phase||'—'],['Milestone',getMsName(t.milestone)],['Owner',t.owner||'—'],['Priority',badge(t.priority,'priority')],['Status',badge(t.status,'task')]].map(([l,v])=>`<div class="df"><div class="df-lbl">${l}</div><div class="df-val">${v}</div></div>`).join('')}</div><div>${[['Due Date',`<span class="${od?'od-text':''}">${fmtD(t.due)}</span>`],['Actual Completion',fmtD(t.actualCompletion)],['Progress',`<div style="display:flex;align-items:center;gap:5px"><div class="pbar flex1"><div class="pfill ${parseInt(t.pct)>=100?'done':''}" style="width:${t.pct||0}%"></div></div><strong>${t.pct||0}%</strong></div>`],['Est. Effort',(t.estEffort||'—')+' hrs'],['Actual Effort',(t.actEffort||'—')+' hrs'],['Risk Flag',t.riskFlag?'<span class="badge b-am">⚠ Risk</span>':'No']].map(([l,v])=>`<div class="df"><div class="df-lbl">${l}</div><div class="df-val">${v}</div></div>`).join('')}</div></div>${t.description?`<div class="df"><div class="df-lbl">Description</div><div class="df-val">${esc(t.description)}</div></div>`:''}${t.dependency?`<div class="df"><div class="df-lbl">Depends On</div><div class="df-val">${esc(t.dependency)}</div></div>`:''}${t.blocking?`<div class="df"><div class="df-lbl">Blocking</div><div class="df-val">${esc(t.blocking)}</div></div>`:''}<div class="sec-lbl mt12">Comments</div><div id="cmt-section">${renderComments('Task',id)}</div><div class="flex gap8 mt8"><input type="text" id="qc-input" placeholder="Add a comment…" style="flex:1"><button class="btn btn-s btn-sm" onclick="quickAddComment('Task','${id}')">Comment</button></div>`;
+  document.getElementById('det-foot').innerHTML=`<button class="btn btn-s" onclick="closeModal('detail-modal')">Close</button>${t.status!=='Done'?`<button class="btn btn-ok" onclick="completeTask('${id}');closeModal('detail-modal')">✓ Mark Done</button>`:''}<button class="btn btn-p" onclick="closeModal('detail-modal');openTkModal('${id}')">Edit</button>`;
+  openModal('detail-modal')
+}
+function quickAddTask(){populateModalSelects();if(APP.activePrj!=='all')document.getElementById('qt-proj').value=APP.activePrj;document.getElementById('qt-name').value='';openModal('qt-modal')}
+function saveQuickTask(){
+  const name=document.getElementById('qt-name').value.trim();if(!name){toast('Task name required','error');return}
+  const now=new Date().toISOString();
+  const t={id:gid(),name,project:document.getElementById('qt-proj').value,owner:document.getElementById('qt-owner').value,due:document.getElementById('qt-due').value,priority:document.getElementById('qt-pri').value||'Medium',status:'Not Started',pct:'0',health:'Green',created:now,updated:now};
+  D.tasks.push(t);sv('tasks',D.tasks);addAudit('Task',t.id,'Created',null,t.name,APP.curUser.name);
+  populateTkFilters();closeModal('qt-modal');if(APP.page==='tasks')renderTasks();renderDash();updateBadges();updateSbar();toast('Task added','success');document.getElementById('qt-name').value=''
+}
+function exportTasks(){
+  const tasks=filteredTasks();
+  const rows=[['ID','Name','Project','Phase','Milestone','Owner','Priority','Status','Health','Start','Due','Actual Completion','Pct','Est','Act','Risk']];
+  tasks.forEach(t=>rows.push([t.id,t.name,getPrjName(t.project),t.phase||'',getMsName(t.milestone),t.owner||'',t.priority||'',t.status||'',t.health||'',t.start||'',t.due||'',t.actualCompletion||'',t.pct||'0',t.estEffort||'',t.actEffort||'',t.riskFlag?'Yes':'No']));
+  dlCSV(rows,'tasks.csv');toast('Tasks exported')
+}
+
+// ── SAVED VIEWS ──────────────────────────────────────────────
+const DEF_VIEWS=[{id:'v1',name:'My Open Tasks',f:{status:'Not Started'}},{id:'v2',name:'Overdue Tasks',f:{quick:'overdue'}},{id:'v3',name:'Due This Week',f:{quick:'week'}},{id:'v4',name:'Critical Items',f:{pri:'Critical'}},{id:'v5',name:'Blocked Tasks',f:{quick:'blocked'}}];
+function renderSavedViews(){
+  const views=ld('views')||DEF_VIEWS;
+  document.getElementById('sv-list').innerHTML=views.map(v=>`<div class="svitem" onclick="loadView('${v.id}')"><span>📌</span><span style="flex:1">${esc(v.name)}</span><span class="svdel" onclick="event.stopPropagation();delView('${v.id}')">✕</span></div>`).join('')
+}
+function saveCurrentView(){openModal('sv-modal')}
+function doSaveView(){
+  const name=document.getElementById('svm-name').value.trim();if(!name){toast('Name required','error');return}
+  const views=ld('views')||[...DEF_VIEWS];
+  const f={project:document.getElementById('tkf-proj')?.value||'',status:document.getElementById('tkf-status')?.value||'',pri:document.getElementById('tkf-pri')?.value||'',owner:document.getElementById('tkf-owner')?.value||'',search:document.getElementById('tkf-search')?.value||''};
+  views.push({id:gid(),name,f});sv('views',views);renderSavedViews();closeModal('sv-modal');document.getElementById('svm-name').value='';toast('View saved')
+}
+function loadView(id){
+  const views=ld('views')||DEF_VIEWS;const v=views.find(x=>x.id===id);if(!v)return;const f=v.f||{};
+  if(f.project){const e=document.getElementById('tkf-proj');if(e)e.value=f.project}
+  if(f.status){const e=document.getElementById('tkf-status');if(e)e.value=f.status}
+  if(f.pri){const e=document.getElementById('tkf-pri');if(e)e.value=f.pri}
+  if(f.owner){const e=document.getElementById('tkf-owner');if(e)e.value=f.owner}
+  if(f.search){const e=document.getElementById('tkf-search');if(e)e.value=f.search}
+  navTo('tasks');
+  if(f.quick){document.getElementById('tkf-quick').value=f.quick;applyQuickFilter(f.quick)}else renderTasks();
+  toast('View loaded: '+v.name,'info')
+}
+function delView(id){let views=ld('views')||DEF_VIEWS;views=views.filter(v=>v.id!==id);sv('views',views);renderSavedViews();toast('View removed')}
+
+// ============================================================
+// RISKS
+// ============================================================
+function renderRisks(){
+  const body=document.getElementById('rk-body');let risks=filteredRisks();
+  if(!risks.length){body.innerHTML='<div style="padding:20px">'+emptyHTML('⚠️','No Records','Add a risk, issue, or dependency.')+'</div>';return}
+  body.innerHTML=`<div style="padding:18px"><div class="twrap"><table><thead><tr><th>Title</th><th>Type</th><th>Project</th><th>Owner</th><th>Priority</th><th>Impact</th><th>Status</th><th>Due</th><th>Actions</th></tr></thead><tbody>${risks.map(r=>{const od=isOD(r.due,r.status);return`<tr ${od?'style="background:var(--red-bg)"':''}><td><strong class="clink" onclick="openRkDetail('${r.id}')">${esc(r.title)}</strong>${od?'<span class="badge b-re" style="margin-left:3px">OD</span>':''}</td><td><span class="badge ${r.type==='Risk'?'b-re':r.type==='Issue'?'b-am':r.type==='Dependency'?'b-bl':'b-pu'}">${r.type}</span></td><td style="font-size:10px">${getPrjName(r.project)}</td><td>${r.owner||'—'}</td><td>${badge(r.priority,'priority')}</td><td>${badge(r.impact,'priority')}</td><td>${badge(r.status,'risk')}</td><td class="${od?'od-text':''}">${fmtD(r.due)}</td><td><div class="flex gap6"><button class="btn btn-s btn-xs" onclick="openRkModal('${r.id}')">Edit</button><button class="btn btn-d btn-xs" onclick="delRisk('${r.id}')">Del</button></div></td></tr>`}).join('')}</tbody></table></div></div>`
+}
+function filteredRisks(){
+  let risks=APP.activePrj!=='all'?D.risks.filter(r=>r.project===APP.activePrj):[...D.risks];
+  if(APP.rkTab&&APP.rkTab!=='all')risks=risks.filter(r=>r.type===APP.rkTab);
+  const fp=document.getElementById('rf-proj')?.value,fs=document.getElementById('rf-status')?.value,fpr=document.getElementById('rf-pri')?.value,fo=document.getElementById('rf-owner')?.value,fse=document.getElementById('rf-search')?.value.toLowerCase();
+  if(fp)risks=risks.filter(r=>r.project===fp);if(fs)risks=risks.filter(r=>r.status===fs);if(fpr)risks=risks.filter(r=>r.priority===fpr);if(fo)risks=risks.filter(r=>r.owner===fo);if(fse)risks=risks.filter(r=>(r.title+r.owner).toLowerCase().includes(fse));return risks
+}
+function switchRiskTab(tab,el){APP.rkTab=tab;document.querySelectorAll('#page-risks .tab').forEach(t=>t.classList.remove('active'));if(el)el.classList.add('active');renderRisks()}
+function clearRkFilters(){['rf-proj','rf-status','rf-pri','rf-owner'].forEach(id=>document.getElementById(id).value='');document.getElementById('rf-search').value='';renderRisks()}
+function openRkModal(id){
+  populateModalSelects();APP.editId=id||null;
+  document.getElementById('rkm-modal-title').textContent=id?'Edit Record':'New Risk / Issue';
+  ['rkm-title','rkm-proj','rkm-phase','rkm-owner','rkm-pri','rkm-due','rkm-desc','rkm-mit','rkm-res'].forEach(f=>{const e=document.getElementById(f);if(e)e.value=''});
+  document.getElementById('rkm-type').value='Risk';document.getElementById('rkm-impact').value='Medium';document.getElementById('rkm-prob').value='Medium';
+  if(id){const r=D.risks.find(x=>x.id===id);if(r){document.getElementById('rkm-title').value=r.title||'';document.getElementById('rkm-type').value=r.type||'Risk';document.getElementById('rkm-proj').value=r.project||'';document.getElementById('rkm-phase').value=r.phase||'';document.getElementById('rkm-owner').value=r.owner||'';document.getElementById('rkm-pri').value=r.priority||'';document.getElementById('rkm-impact').value=r.impact||'Medium';document.getElementById('rkm-prob').value=r.probability||'Medium';document.getElementById('rkm-status').value=r.status||'';document.getElementById('rkm-due').value=r.due||'';document.getElementById('rkm-desc').value=r.description||'';document.getElementById('rkm-mit').value=r.mitigation||'';document.getElementById('rkm-res').value=r.resolution||''}}
+  else{if(APP.activePrj!=='all')document.getElementById('rkm-proj').value=APP.activePrj;document.getElementById('rkm-status').value='Open';document.getElementById('rkm-pri').value='Medium'}
+  openModal('rk-modal')
+}
+function saveRisk(){
+  const title=document.getElementById('rkm-title').value.trim();if(!title){toast('Title required','error');return}
+  const now=new Date().toISOString();
+  const r={id:APP.editId||gid(),title,type:document.getElementById('rkm-type').value||'Risk',project:document.getElementById('rkm-proj').value,phase:document.getElementById('rkm-phase').value,owner:document.getElementById('rkm-owner').value,priority:document.getElementById('rkm-pri').value||'Medium',impact:document.getElementById('rkm-impact').value||'Medium',probability:document.getElementById('rkm-prob').value||'Medium',status:document.getElementById('rkm-status').value||'Open',due:document.getElementById('rkm-due').value,description:document.getElementById('rkm-desc').value,mitigation:document.getElementById('rkm-mit').value,resolution:document.getElementById('rkm-res').value,updated:now};
+  const isNew=!APP.editId;
+  if(isNew){r.created=now;D.risks.push(r)}else{const i=D.risks.findIndex(x=>x.id===r.id);if(i>=0)D.risks[i]=r}
+  sv('risks',D.risks);addAudit('Risk',r.id,isNew?'Created':'Updated',null,r.title,APP.curUser.name);
+  populateRkFilters();closeModal('rk-modal');renderRisks();renderDash();updateBadges();toast(isNew?'Record created':'Record updated','success')
+}
+function delRisk(id){
+  const r=D.risks.find(x=>x.id===id);if(!r)return;
+  showConfirm('Delete Record',`Delete "${r.title}"?`,()=>{D.risks=D.risks.filter(x=>x.id!==id);sv('risks',D.risks);addAudit('Risk',id,'Deleted',r.title,null,APP.curUser.name);renderRisks();renderDash();updateBadges();toast('Record deleted')},'🗑️')
+}
+function openRkDetail(id){
+  const r=D.risks.find(x=>x.id===id);if(!r)return;
+  document.getElementById('det-title').textContent=r.title;
+  document.getElementById('det-body').innerHTML=`<div class="g2 mb12"><div>${[['Type',`<span class="badge ${r.type==='Risk'?'b-re':r.type==='Issue'?'b-am':'b-bl'}">${r.type}</span>`],['Project',getPrjName(r.project)],['Phase',r.phase||'—'],['Owner',r.owner||'—'],['Priority',badge(r.priority,'priority')],['Status',badge(r.status,'risk')]].map(([l,v])=>`<div class="df"><div class="df-lbl">${l}</div><div class="df-val">${v}</div></div>`).join('')}</div><div>${[['Impact',badge(r.impact,'priority')],['Probability',r.probability||'—'],['Due Date',`<span class="${isOD(r.due,r.status)?'od-text':''}">${fmtD(r.due)}</span>`]].map(([l,v])=>`<div class="df"><div class="df-lbl">${l}</div><div class="df-val">${v}</div></div>`).join('')}</div></div>${r.description?`<div class="df"><div class="df-lbl">Description</div><div class="df-val">${esc(r.description)}</div></div>`:''}${r.mitigation?`<div class="df"><div class="df-lbl">Mitigation</div><div class="df-val">${esc(r.mitigation)}</div></div>`:''}${r.resolution?`<div class="df"><div class="df-lbl">Resolution</div><div class="df-val">${esc(r.resolution)}</div></div>`:''}<div class="sec-lbl mt12">Comments</div><div id="cmt-section">${renderComments('Risk',id)}</div><div class="flex gap8 mt8"><input type="text" id="qc-input" placeholder="Add a comment…" style="flex:1"><button class="btn btn-s btn-sm" onclick="quickAddComment('Risk','${id}')">Comment</button></div>`;
+  document.getElementById('det-foot').innerHTML=`<button class="btn btn-s" onclick="closeModal('detail-modal')">Close</button><button class="btn btn-p" onclick="closeModal('detail-modal');openRkModal('${id}')">Edit</button>`;
+  openModal('detail-modal')
+}
+function exportRisks(){
+  const risks=filteredRisks();
+  const rows=[['ID','Title','Type','Project','Phase','Owner','Priority','Impact','Probability','Status','Due Date','Description','Mitigation','Resolution']];
+  risks.forEach(r=>rows.push([r.id,r.title,r.type,getPrjName(r.project),r.phase||'',r.owner||'',r.priority||'',r.impact||'',r.probability||'',r.status||'',r.due||'',r.description||'',r.mitigation||'',r.resolution||'']));
+  dlCSV(rows,'risks.csv');toast('Risks exported')
+}
+
+// ============================================================
+// TIMELINE
+// ============================================================
+function switchTimelineView(v,el){APP.tlView=v;document.querySelectorAll('#page-timeline .tab').forEach(t=>t.classList.remove('active'));if(el)el.classList.add('active');renderTimeline()}
+function renderTimeline(){
+  const body=document.getElementById('tl-body');
+  const fp=document.getElementById('tf-proj')?.value||'';
+  const fph=document.getElementById('tf-phase')?.value||'';
+  const ftype=document.getElementById('tf-type')?.value||'';
+  const fo=document.getElementById('tf-owner')?.value||'';
+  let prjs=fp?D.projects.filter(p=>p.id===fp):(APP.activePrj!=='all'?D.projects.filter(p=>p.id===APP.activePrj):D.projects);
+  let ms=D.milestones,tasks=D.tasks;
+  if(fp){ms=ms.filter(m=>m.project===fp);tasks=tasks.filter(t=>t.project===fp)}
+  else if(APP.activePrj!=='all'){ms=ms.filter(m=>m.project===APP.activePrj);tasks=tasks.filter(t=>t.project===APP.activePrj)}
+  if(fph){ms=ms.filter(m=>m.phase===fph);tasks=tasks.filter(t=>t.phase===fph)}
+  if(fo){ms=ms.filter(m=>m.owner===fo);tasks=tasks.filter(t=>t.owner===fo)}
+  let items=[];
+  if(!ftype||ftype==='phase')prjs.forEach(p=>{if(p.start&&p.end)items.push({type:'phase',id:p.id,name:p.name,start:p.start,end:p.end,status:p.status,pct:calcPrjComp(p),owner:p.manager})});
+  if(!ftype||ftype==='milestone')ms.forEach(m=>{if(m.start||m.due)items.push({type:'milestone',id:m.id,name:m.name,start:m.start||m.due,end:m.due||m.start,status:m.status,pct:calcMsComp(m),owner:m.owner,od:isOD(m.due,m.status)})});
+  if(!ftype||ftype==='task')tasks.forEach(t=>{if(t.start||t.due)items.push({type:'task',id:t.id,name:t.name,start:t.start||t.due,end:t.due||t.start,status:t.status,pct:parseInt(t.pct)||0,owner:t.owner,od:isOD(t.due,t.status),priority:t.priority})});
+  if(!items.length){body.innerHTML='<div style="padding:20px">'+emptyHTML('📅','No Timeline Data','Add projects with start/end dates, milestones, or tasks with dates.')+'</div>';return}
+  const allD=items.flatMap(i=>[i.start,i.end]).filter(Boolean).map(d=>pDate(d)).filter(Boolean);
+  if(!allD.length){body.innerHTML='<div style="padding:20px">'+emptyHTML('📅','No Date Data','Assign dates to see the timeline.')+'</div>';return}
+  let minD=new Date(Math.min(...allD)),maxD=new Date(Math.max(...allD));
+  minD.setMonth(minD.getMonth()-1);minD.setDate(1);
+  maxD.setMonth(maxD.getMonth()+2);maxD.setDate(0);
+  const totalDays=Math.max(1,dBetween(minD.toISOString().split('T')[0],maxD.toISOString().split('T')[0]));
+  const LW=260;const pxD=Math.max(2,Math.min(10,1600/totalDays));
+  const minStr=minD.toISOString().split('T')[0];
+  // Build months
+  let months=[];let cur=new Date(minD);
+  while(cur<=maxD){
+    const ms2=new Date(cur.getFullYear(),cur.getMonth()+1,0);
+    const days=Math.min(ms2.getDate()-cur.getDate()+1,dBetween(cur.toISOString().split('T')[0],maxD.toISOString().split('T')[0])+1);
+    months.push({lbl:cur.toLocaleDateString('en-GB',{month:'short',year:'2-digit'}),w:Math.max(1,days)*pxD});
+    cur.setMonth(cur.getMonth()+1);cur.setDate(1)
+  }
+  const todayOff=LW+dBetween(minStr,tod())*pxD;
+  const icos={phase:'📁',milestone:'🏁',task:'✅'};
+  const indents={phase:0,milestone:12,task:20};
+  function barCls(item){
+    if(['Completed','Done'].includes(item.status))return 'gc';
+    if(item.od)return 'god';
+    if(['At Risk','Blocked'].includes(item.status))return 'gat';
+    return{phase:'gp',milestone:'gm',task:'gt'}[item.type]||'gt'
+  }
+  const rows=items.map(item=>{
+    const s=pDate(item.start),e=pDate(item.end);
+    let barHtml='';
+    if(s&&e){const left=dBetween(minStr,item.start)*pxD;const w=Math.max(4,(dBetween(item.start,item.end)+1)*pxD);barHtml=`<div class="g-bar ${barCls(item)}" style="left:${left}px;width:${w}px" title="${esc(item.name)} (${item.start} → ${item.end})" onclick="event.stopPropagation();${'task'===item.type?`openTkDetail('${item.id}')`:'milestone'===item.type?`openMsDetail('${item.id}')`:``}">${w>36?item.pct+'%':''}</div>`}
+    return`<div class="g-row"><div class="g-lbl" style="width:${LW}px;padding-left:${10+indents[item.type]}px"><span style="font-size:11px">${icos[item.type]}</span><div><div class="g-lbl-nm" style="max-width:${LW-50}px">${esc(item.name)}</div><div style="font-size:9px;color:var(--text-muted)">${item.owner||''}</div></div></div><div class="g-track" style="width:${totalDays*pxD}px;position:relative">${barHtml}</div></div>`
+  }).join('');
+  const mhdrs=months.map(m=>`<div class="g-month" style="width:${m.w}px">${m.lbl}</div>`).join('');
+  body.innerHTML=`<div style="overflow-x:auto"><div style="min-width:${LW+totalDays*pxD}px">
+    <div class="g-hdr"><div class="g-lbl-hdr" style="width:${LW}px">Name / Owner</div><div style="display:flex">${mhdrs}</div></div>
+    <div style="position:relative">${rows}<div style="position:absolute;top:0;bottom:0;left:${todayOff}px;width:2px;background:var(--red);opacity:.65;pointer-events:none;z-index:5"><span style="position:absolute;top:2px;left:3px;font-size:9px;color:var(--red);font-weight:700;white-space:nowrap">Today</span></div></div>
+    <div style="padding:8px 14px;font-size:10px;color:var(--text-muted);display:flex;gap:14px;background:var(--bg-surface);border-top:1px solid var(--border-color)">
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:7px;background:var(--purple);border-radius:2px;display:inline-block"></span>Project</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:7px;background:var(--blue);border-radius:2px;display:inline-block"></span>Milestone</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:7px;background:var(--teal);border-radius:2px;display:inline-block"></span>Task</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:7px;background:var(--green);border-radius:2px;display:inline-block"></span>Completed</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:7px;background:var(--red);border-radius:2px;display:inline-block"></span>Overdue</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:7px;background:var(--amber);border-radius:2px;display:inline-block"></span>At Risk/Blocked</span>
+    </div>
+  </div></div>`
+}
+
+// ============================================================
+// CALENDAR
+// ============================================================
+function calNav(dir){if(dir===0)APP.calDate=new Date();else APP.calDate=new Date(APP.calDate.getFullYear(),APP.calDate.getMonth()+dir,1);renderCalendar()}
+function renderCalendar(){
+  const body=document.getElementById('cal-body');
+  const d=APP.calDate,yr=d.getFullYear(),mo=d.getMonth();
+  document.getElementById('cal-ttl').textContent=new Date(yr,mo,1).toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  const fp=document.getElementById('calf-proj')?.value||'';
+  const showT=document.getElementById('calf-tasks')?.checked!==false;
+  const showM=document.getElementById('calf-ms')?.checked!==false;
+  const showR=document.getElementById('calf-risks')?.checked!==false;
+  const moStr=`${yr}-${String(mo+1).padStart(2,'0')}`;
+  const map={};
+  const add=(ds,item)=>{if(!ds||!ds.startsWith(moStr))return;if(!map[ds])map[ds]=[];map[ds].push(item)};
+  let tasks=fp?D.tasks.filter(t=>t.project===fp):(APP.activePrj!=='all'?D.tasks.filter(t=>t.project===APP.activePrj):D.tasks);
+  let ms2=fp?D.milestones.filter(m=>m.project===fp):(APP.activePrj!=='all'?D.milestones.filter(m=>m.project===APP.activePrj):D.milestones);
+  let risks=fp?D.risks.filter(r=>r.project===fp):(APP.activePrj!=='all'?D.risks.filter(r=>r.project===APP.activePrj):D.risks);
+  if(showT)tasks.forEach(t=>{if(t.due)add(t.due,{type:'task',lbl:t.name,id:t.id,od:isOD(t.due,t.status),status:t.status})});
+  if(showM)ms2.forEach(m=>{if(m.due)add(m.due,{type:'ms',lbl:m.name,id:m.id,od:isOD(m.due,m.status)})});
+  if(showR)risks.forEach(r=>{if(r.due)add(r.due,{type:'risk',lbl:r.title,id:r.id,od:isOD(r.due,r.status)})});
+  const fd=new Date(yr,mo,1).getDay();
+  const dim=new Date(yr,mo+1,0).getDate();
+  const pd=new Date(yr,mo,0).getDate();
+  const todayStr=tod();
+  const dn=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let cells='';
+  for(let i=0;i<fd;i++)cells+=`<div class="cal-cell om"><div class="dnum">${pd-fd+i+1}</div></div>`;
+  for(let d2=1;d2<=dim;d2++){
+    const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(d2).padStart(2,'0')}`;
+    const isToday=ds===todayStr;
+    const items2=map[ds]||[];
+    const itemsHtml=items2.slice(0,4).map(it=>{
+      const cls=it.od?'ci ci-od':it.type==='ms'?'ci ci-m':it.type==='risk'?'ci ci-r':'ci ci-t';
+      const fn=it.type==='task'?`openTkDetail('${it.id}')`:it.type==='ms'?`openMsDetail('${it.id}')`:it.type==='risk'?`openRkDetail('${it.id}')`:''
+      return`<div class="${cls}" onclick="${fn}" title="${esc(it.lbl)}">${esc(it.lbl)}</div>`
+    }).join('');
+    const more=items2.length>4?`<div style="font-size:9px;color:var(--text-muted)">+${items2.length-4} more</div>`:'';
+    cells+=`<div class="cal-cell ${isToday?'today':''}"><div class="dnum">${d2}</div>${itemsHtml}${more}</div>`
+  }
+  const total=fd+dim;const rem=total%7===0?0:7-(total%7);
+  for(let i=1;i<=rem;i++)cells+=`<div class="cal-cell om"><div class="dnum">${i}</div></div>`;
+  body.innerHTML=`<div class="cal-grid"><div class="cal-hdr">${dn.map(n=>`<div class="cal-dn">${n}</div>`).join('')}</div><div class="cal-body">${cells}</div></div><div style="margin-top:10px;font-size:11px;color:var(--text-muted);display:flex;gap:14px"><span><span style="display:inline-block;width:10px;height:8px;background:var(--blue-bg);border:1px solid var(--blue);border-radius:2px"></span> Task</span><span><span style="display:inline-block;width:10px;height:8px;background:var(--purple-bg);border:1px solid var(--purple);border-radius:2px"></span> Milestone</span><span><span style="display:inline-block;width:10px;height:8px;background:var(--red-bg);border:1px solid var(--red);border-radius:2px"></span> Risk/Issue</span><span><span style="display:inline-block;width:10px;height:8px;background:var(--red);border-radius:2px"></span> Overdue</span></div>`
+}
+
+// ============================================================
+// REPORTS
+// ============================================================
+const REPORTS=[
+  {id:'summary',lbl:'Project Summary',ico:'📁'},
+  {id:'milestone',lbl:'Milestone Report',ico:'🏁'},
+  {id:'task',lbl:'Task Report',ico:'✅'},
+  {id:'overdue',lbl:'Overdue Tasks',ico:'🔴'},
+  {id:'week',lbl:'Due This Week',ico:'📆'},
+  {id:'risk',lbl:'Risk & Issue Report',ico:'⚠️'},
+  {id:'workload',lbl:'Owner Workload',ico:'👤'},
+  {id:'weekly',lbl:'Weekly Status Report',ico:'📊'},
+  {id:'audit',lbl:'Audit Trail Report',ico:'🔍'}
+];
+let activeRpt=null;
+function renderReportNav(){
+  document.getElementById('rpt-nav').innerHTML=REPORTS.map(r=>`<div class="report-nav-item ${activeRpt===r.id?'active':''}" onclick="generateReport('${r.id}',this)">${r.ico} ${r.lbl}</div>`).join('')
+}
+function generateReport(id,el){
+  activeRpt=id;
+  document.querySelectorAll('.report-nav-item').forEach(e=>e.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const body=document.getElementById('rpt-body');
+  const pid=APP.activePrj;
+  const aP=pid==='all'?D.projects:D.projects.filter(p=>p.id===pid);
+  const aM=pid==='all'?D.milestones:D.milestones.filter(m=>m.project===pid);
+  const aT=pid==='all'?D.tasks:D.tasks.filter(t=>t.project===pid);
+  const aR=pid==='all'?D.risks:D.risks.filter(r=>r.project===pid);
+  switch(id){
+    case 'summary': body.innerHTML=rptSummary(aP,aM,aT,aR);break;
+    case 'milestone': body.innerHTML=rptMilestone(aM);break;
+    case 'task': body.innerHTML=rptTask(aT);break;
+    case 'overdue': body.innerHTML=rptOverdue(aT);break;
+    case 'week': body.innerHTML=rptWeek(aT,aM);break;
+    case 'risk': body.innerHTML=rptRisk(aR);break;
+    case 'workload': body.innerHTML=rptWorkload(aT);break;
+    case 'weekly': body.innerHTML=rptWeekly(aP,aM,aT,aR);break;
+    case 'audit': body.innerHTML=rptAudit();break;
+  }
+}
+function rptActions(filename,csvRows){return`<div style="display:flex;gap:8px;margin-bottom:18px"><button class="btn btn-p btn-sm" onclick="window.print()">🖨 Print</button><button class="btn btn-s btn-sm" onclick="copyRptToClipboard()">📋 Copy</button>${csvRows?`<button class="btn btn-s btn-sm" onclick="dlCSV(${JSON.stringify(csvRows)},'${filename}')">⬇ Export CSV</button>`:''}</div>`}
+function copyRptToClipboard(){const el=document.getElementById('rpt-body');navigator.clipboard.writeText(el.innerText||el.textContent).then(()=>toast('Report copied','success'))}
+function rptSummary(aP,aM,aT,aR){
+  const rows=aP.map(p=>{const pc=calcPrjComp(p);const pt=aT.filter(t=>t.project===p.id);const pm=aM.filter(m=>m.project===p.id);const od=pt.filter(t=>isOD(t.due,t.status));return`<tr><td>${esc(p.name)}</td><td>${p.code||'—'}</td><td>${p.customer||'—'}</td><td>${badge(p.status,'project')}</td><td><span class="hdot ${p.health==='Green'?'hg':p.health==='Amber'?'ha':'hr2'}"></span>${p.health||'—'}</td><td>${fmtD(p.start)}</td><td>${fmtD(p.end)}</td><td>${pc}%</td><td>${pt.length}</td><td>${pm.length}</td><td ${od.length?'class="od-text"':''}>${od.length}</td></tr>`}).join('');
+  const csvR=[['Name','Code','Customer','Status','Health','Start','Target End','Completion%','Tasks','Milestones','Overdue'],...aP.map(p=>[p.name,p.code||'',p.customer||'',p.status||'',p.health||'',p.start||'',p.end||'',calcPrjComp(p)+'%',D.tasks.filter(t=>t.project===p.id).length,D.milestones.filter(m=>m.project===p.id).length,D.tasks.filter(t=>t.project===p.id&&isOD(t.due,t.status)).length])];
+  return`<div class="rpt-wrap">${rptActions('project_summary.csv',csvR)}<div class="rpt-hdr"><div class="rpt-title">Project Summary Report</div><div class="rpt-sub">Generated: ${new Date().toLocaleString('en-GB')} · ${aP.length} projects</div></div><div class="rpt-kgrid"><div class="rpt-kpi"><div class="rpt-kpi-v">${aP.length}</div><div class="rpt-kpi-l">Total Projects</div></div><div class="rpt-kpi"><div class="rpt-kpi-v">${aP.filter(p=>p.status==='Active').length}</div><div class="rpt-kpi-l">Active</div></div><div class="rpt-kpi"><div class="rpt-kpi-v">${aT.filter(t=>isOD(t.due,t.status)).length}</div><div class="rpt-kpi-l">Overdue Tasks</div></div></div><div class="twrap"><table><thead><tr><th>Project</th><th>Code</th><th>Customer</th><th>Status</th><th>Health</th><th>Start</th><th>Target</th><th>Comp%</th><th>Tasks</th><th>MS</th><th>OD</th></tr></thead><tbody>${rows||'<tr><td colspan="11" class="tc tmuted">No projects</td></tr>'}</tbody></table></div></div>`
+}
+function rptMilestone(aM){
+  const csvR=[['ID','Name','Project','Phase','Owner','Status','Health','Due','Actual','Pct'],...aM.map(m=>[m.id,m.name,getPrjName(m.project),m.phase||'',m.owner||'',m.status||'',m.health||'',m.due||'',m.actualDate||'',m.pct||'0'])];
+  const rows=aM.map(m=>{const od=isOD(m.due,m.status);return`<tr ${od?'style="background:var(--red-bg)"':''}><td>${esc(m.name)}</td><td style="font-size:10px">${getPrjName(m.project)}</td><td>${m.phase?badge(m.phase,''):'—'}</td><td>${m.owner||'—'}</td><td>${badge(m.status,'milestone')}</td><td class="${od?'od-text':''}">${fmtD(m.due)}</td><td>${fmtD(m.actualDate)}</td><td>${calcMsComp(m)}%</td></tr>`}).join('');
+  return`<div class="rpt-wrap">${rptActions('milestones.csv',csvR)}<div class="rpt-hdr"><div class="rpt-title">Milestone Report</div><div class="rpt-sub">Generated: ${new Date().toLocaleString('en-GB')} · ${aM.length} milestones</div></div><div class="rpt-kgrid"><div class="rpt-kpi"><div class="rpt-kpi-v">${aM.length}</div><div class="rpt-kpi-l">Total</div></div><div class="rpt-kpi"><div class="rpt-kpi-v">${aM.filter(m=>m.status==='Completed').length}</div><div class="rpt-kpi-l">Completed</div></div><div class="rpt-kpi"><div class="rpt-kpi-v">${aM.filter(m=>isOD(m.due,m.status)).length}</div><div class="rpt-kpi-l">Overdue</div></div></div><div class="twrap"><table><thead><tr><th>Milestone</th><th>Project</th><th>Phase</th><th>Owner</th><th>Status</th><th>Due</th><th>Actual</th><th>Progress</th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="tc tmuted">No milestones</td></tr>'}</tbody></table></div></div>`
+}
+function rptTask(aT){
+  const csvR=[['ID','Name','Project','Owner','Priority','Status','Due','Pct'],...aT.map(t=>[t.id,t.name,getPrjName(t.project),t.owner||'',t.priority||'',t.status||'',t.due||'',t.pct||'0'])];
+  const rows=aT.map(t=>{const od=isOD(t.due,t.status);return`<tr ${od?'style="background:var(--red-bg)"':''}><td>${esc(t.name)}</td><td style="font-size:10px">${getPrjName(t.project)}</td><td>${t.owner||'—'}</td><td>${badge(t.priority,'priority')}</td><td>${badge(t.status,'task')}</td><td class="${od?'od-text':''}">${fmtD(t.due)}</td><td>${t.pct||0}%</td></tr>`}).join('');
+  return`<div class="rpt-wrap">${rptActions('tasks.csv',csvR)}<div class="rpt-hdr"><div class="rpt-title">Task Report</div><div class="rpt-sub">Generated: ${new Date().toLocaleString('en-GB')} · ${aT.length} tasks</div></div><div class="rpt-kgrid"><div class="rpt-kpi"><div class="rpt-kpi-v">${aT.length}</div><div class="rpt-kpi-l">Total</div></div><div class="rpt-kpi"><div class="rpt-kpi-v">${aT.filter(t=>t.status==='Done').length}</div><div class="rpt-kpi-l">Done</div></div><div class="rpt-kpi"><div class="rpt-kpi-v">${aT.filter(t=>isOD(t.due,t.status)).length}</div><div class="rpt-kpi-l">Overdue</div></div></div><div class="twrap"><table><thead><tr><th>Task</th><th>Project</th><th>Owner</th><th>Priority</th><th>Status</th><th>Due</th><th>Pct</th></tr></thead><tbody>${rows||'<tr><td colspan="7" class="tc tmuted">No tasks</td></tr>'}</tbody></table></div></div>`
+}
+function rptOverdue(aT){
+  const od=aT.filter(t=>isOD(t.due,t.status));
+  const csvR=[['Name','Project','Owner','Priority','Status','Due','Days Overdue'],...od.map(t=>[t.name,getPrjName(t.project),t.owner||'',t.priority||'',t.status||'',t.due||'',Math.abs(dBetween(t.due,tod()))])];
+  const rows=od.map(t=>`<tr><td>${esc(t.name)}</td><td style="font-size:10px">${getPrjName(t.project)}</td><td>${t.owner||'—'}</td><td>${badge(t.priority,'priority')}</td><td>${badge(t.status,'task')}</td><td class="od-text">${fmtD(t.due)}</td><td class="od-text bold">${Math.abs(dBetween(t.due,tod()))}d</td></tr>`).join('');
+  return`<div class="rpt-wrap">${rptActions('overdue_tasks.csv',csvR)}<div class="rpt-hdr"><div class="rpt-title">Overdue Tasks Report</div><div class="rpt-sub">Generated: ${new Date().toLocaleString('en-GB')} · ${od.length} overdue tasks</div></div><div class="twrap"><table><thead><tr><th>Task</th><th>Project</th><th>Owner</th><th>Priority</th><th>Status</th><th>Due</th><th>Days OD</th></tr></thead><tbody>${rows||'<tr><td colspan="7" class="tc tmuted" style="padding:20px">No overdue tasks — great work!</td></tr>'}</tbody></table></div></div>`
+}
+function rptWeek(aT,aM){
+  const wt=aT.filter(t=>isDTW(t.due)&&!['Done','Cancelled'].includes(t.status));
+  const wm=aM.filter(m=>isDTW(m.due)&&!['Completed','Cancelled'].includes(m.status));
+  const csvR=[['Name','Type','Project','Owner','Status','Due'],...wt.map(t=>[t.name,'Task',getPrjName(t.project),t.owner||'',t.status||'',t.due||'']),...wm.map(m=>[m.name,'Milestone',getPrjName(m.project),m.owner||'',m.status||'',m.due||''])];
+  const rows=[...wt.map(t=>`<tr><td>${esc(t.name)}</td><td><span class="badge b-bl">Task</span></td><td style="font-size:10px">${getPrjName(t.project)}</td><td>${t.owner||'—'}</td><td>${badge(t.status,'task')}</td><td>${fmtD(t.due)}</td></tr>`),...wm.map(m=>`<tr><td>${esc(m.name)}</td><td><span class="badge b-pu">Milestone</span></td><td style="font-size:10px">${getPrjName(m.project)}</td><td>${m.owner||'—'}</td><td>${badge(m.status,'milestone')}</td><td>${fmtD(m.due)}</td></tr>`)].join('');
+  return`<div class="rpt-wrap">${rptActions('due_this_week.csv',csvR)}<div class="rpt-hdr"><div class="rpt-title">Due This Week Report</div><div class="rpt-sub">Generated: ${new Date().toLocaleString('en-GB')}</div></div><div class="rpt-kgrid"><div class="rpt-kpi"><div class="rpt-kpi-v">${wt.length}</div><div class="rpt-kpi-l">Tasks Due</div></div><div class="rpt-kpi"><div class="rpt-kpi-v">${wm.length}</div><div class="rpt-kpi-l">Milestones Due</div></div><div class="rpt-kpi"><div class="rpt-kpi-v">${wt.length+wm.length}</div><div class="rpt-kpi-l">Total Items</div></div></div><div class="twrap"><table><thead><tr><th>Item</th><th>Type</th><th>Project</th><th>Owner</th><th>Status</th><th>Due</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="tc tmuted" style="padding:20px">Nothing due this week.</td></tr>'}</tbody></table></div></div>`
+}
+function rptRisk(aR){
+  const csvR=[['ID','Title','Type','Project','Owner','Priority','Impact','Status','Due'],...aR.map(r=>[r.id,r.title,r.type,getPrjName(r.project),r.owner||'',r.priority||'',r.impact||'',r.status||'',r.due||''])];
+  const rows=aR.map(r=>{const od=isOD(r.due,r.status);return`<tr ${od?'style="background:var(--red-bg)"':''}><td>${esc(r.title)}</td><td><span class="badge ${r.type==='Risk'?'b-re':r.type==='Issue'?'b-am':'b-bl'}">${r.type}</span></td><td style="font-size:10px">${getPrjName(r.project)}</td><td>${r.owner||'—'}</td><td>${badge(r.priority,'priority')}</td><td>${badge(r.impact,'priority')}</td><td>${badge(r.status,'risk')}</td><td class="${od?'od-text':''}">${fmtD(r.due)}</td></tr>`}).join('');
+  return`<div class="rpt-wrap">${rptActions('risks_issues.csv',csvR)}<div class="rpt-hdr"><div class="rpt-title">Risk &amp; Issue Report</div><div class="rpt-sub">Generated: ${new Date().toLocaleString('en-GB')} · ${aR.length} records</div></div><div class="rpt-kgrid"><div class="rpt-kpi"><div class="rpt-kpi-v">${aR.filter(r=>r.type==='Risk'&&['Open','In Progress'].includes(r.status)).length}</div><div class="rpt-kpi-l">Open Risks</div></div><div class="rpt-kpi"><div class="rpt-kpi-v">${aR.filter(r=>r.type==='Issue'&&['Open','In Progress'].includes(r.status)).length}</div><div class="rpt-kpi-l">Open Issues</div></div><div class="rpt-kpi"><div class="rpt-kpi-v">${aR.filter(r=>['High','Critical'].includes(r.priority)&&['Open','In Progress'].includes(r.status)).length}</div><div class="rpt-kpi-l">High/Critical</div></div></div><div class="twrap"><table><thead><tr><th>Title</th><th>Type</th><th>Project</th><th>Owner</th><th>Priority</th><th>Impact</th><th>Status</th><th>Due</th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="tc tmuted">No records</td></tr>'}</tbody></table></div></div>`
+}
+function rptWorkload(aT){
+  const open=aT.filter(t=>!['Done','Cancelled'].includes(t.status));
+  const byOwner=groupBy(open,'owner');
+  const owners=Object.keys(byOwner).sort((a,b)=>byOwner[b]-byOwner[a]);
+  const rows=owners.map(o=>{const ot=open.filter(t=>t.owner===o);const od=ot.filter(t=>isOD(t.due,t.status));const cr=ot.filter(t=>t.priority==='Critical');return`<tr><td>${esc(o)}</td><td>${ot.length}</td><td>${ot.filter(t=>t.status==='In Progress').length}</td><td>${ot.filter(t=>t.status==='Blocked').length}</td><td ${od.length?'class="od-text"':''}>${od.length}</td><td ${cr.length?'class="od-text"':''}>${cr.length}</td></tr>`}).join('');
+  const csvR=[['Owner','Open Tasks','In Progress','Blocked','Overdue','Critical'],...owners.map(o=>{const ot=open.filter(t=>t.owner===o);return[o,ot.length,ot.filter(t=>t.status==='In Progress').length,ot.filter(t=>t.status==='Blocked').length,ot.filter(t=>isOD(t.due,t.status)).length,ot.filter(t=>t.priority==='Critical').length]})];
+  return`<div class="rpt-wrap">${rptActions('workload.csv',csvR)}<div class="rpt-hdr"><div class="rpt-title">Owner Workload Report</div><div class="rpt-sub">Generated: ${new Date().toLocaleString('en-GB')}</div></div><div class="twrap"><table><thead><tr><th>Owner</th><th>Open Tasks</th><th>In Progress</th><th>Blocked</th><th>Overdue</th><th>Critical</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="tc tmuted">No task assignments</td></tr>'}</tbody></table></div></div>`
+}
+function rptWeekly(aP,aM,aT,aR){
+  const prj=APP.activePrj!=='all'?getPrj(APP.activePrj):aP[0];
+  const now=new Date();const weekStart=sowDate();
+  const weekEnd=new Date(weekStart);weekEnd.setDate(weekStart.getDate()+6);
+  const period=`${weekStart.toLocaleDateString('en-GB')} – ${weekEnd.toLocaleDateString('en-GB')}`;
+  const compT=aT.filter(t=>t.status==='Done'&&t.actualCompletion&&pDate(t.actualCompletion)>=weekStart);
+  const compM=aM.filter(m=>m.status==='Completed'&&m.actualDate&&pDate(m.actualDate)>=weekStart);
+  const newT=aT.filter(t=>t.created&&pDate(t.created.split('T')[0])>=weekStart);
+  const odT=aT.filter(t=>isOD(t.due,t.status));
+  const odM=aM.filter(m=>isOD(m.due,m.status));
+  const openR=aR.filter(r=>r.type==='Risk'&&['Open','In Progress'].includes(r.status));
+  const openI=aR.filter(r=>r.type==='Issue'&&['Open','In Progress'].includes(r.status));
+  const blkT=aT.filter(t=>t.status==='Blocked');
+  const avgC=aT.length?Math.round(aT.reduce((s,t)=>s+(parseInt(t.pct)||0),0)/aT.length):0;
+  const ph=prj?prj.health:'Green';
+  const rpt=`
+<div class="rpt-wrap" id="weekly-rpt">
+${rptActions('weekly_status.txt',null)}
+<div class="rpt-hdr">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div><div class="rpt-title">Weekly Project Status Report</div><div class="rpt-sub">${prj?esc(prj.name):'All Projects'} · Period: ${period}</div></div>
+    <div style="text-align:right"><div style="font-size:11px;color:var(--text-muted)">Overall Health</div><div style="font-size:18px;font-weight:700;color:${ph==='Green'?'var(--green)':ph==='Amber'?'var(--amber)':'var(--red)'}">${ph}</div></div>
+  </div>
+</div>
+<div class="rpt-sec"><div class="rpt-sec-ttl">Executive Summary</div>
+<div class="rpt-kgrid">
+  <div class="rpt-kpi"><div class="rpt-kpi-v">${avgC}%</div><div class="rpt-kpi-l">Overall Completion</div></div>
+  <div class="rpt-kpi"><div class="rpt-kpi-v">${compT.length}</div><div class="rpt-kpi-l">Tasks Completed</div></div>
+  <div class="rpt-kpi"><div class="rpt-kpi-v">${compM.length}</div><div class="rpt-kpi-l">Milestones Done</div></div>
+  <div class="rpt-kpi"><div class="rpt-kpi-v">${odT.length}</div><div class="rpt-kpi-l" style="color:${odT.length?'var(--red)':'inherit'}">Overdue Tasks</div></div>
+  <div class="rpt-kpi"><div class="rpt-kpi-v">${openR.length}</div><div class="rpt-kpi-l" style="color:${openR.length?'var(--amber)':'inherit'}">Open Risks</div></div>
+  <div class="rpt-kpi"><div class="rpt-kpi-v">${blkT.length}</div><div class="rpt-kpi-l" style="color:${blkT.length?'var(--amber)':'inherit'}">Blocked Tasks</div></div>
+</div></div>
+${compT.length||compM.length?`<div class="rpt-sec"><div class="rpt-sec-ttl">✅ Completed This Week</div><ul class="rpt-list">${compM.map(m=>`<li><strong>[Milestone]</strong> ${esc(m.name)}</li>`).join('')}${compT.map(t=>`<li><strong>[Task]</strong> ${esc(t.name)} — Owner: ${t.owner||'—'}</li>`).join('')}</ul></div>`:''}
+${odT.length?`<div class="rpt-sec"><div class="rpt-sec-ttl">🔴 Overdue Items (${odT.length})</div><ul class="rpt-list">${odT.slice(0,10).map(t=>`<li>${esc(t.name)} — Due: ${fmtD(t.due)} — Owner: ${t.owner||'—'} — ${Math.abs(dBetween(t.due,tod()))}d overdue</li>`).join('')}</ul></div>`:''}
+${odM.length?`<div class="rpt-sec"><div class="rpt-sec-ttl">🏁 Delayed Milestones (${odM.length})</div><ul class="rpt-list">${odM.map(m=>`<li>${esc(m.name)} — Planned: ${fmtD(m.due)} — Owner: ${m.owner||'—'}</li>`).join('')}</ul></div>`:''}
+${openR.length||openI.length?`<div class="rpt-sec"><div class="rpt-sec-ttl">⚠️ Open Risks &amp; Issues</div><ul class="rpt-list">${openR.slice(0,5).map(r=>`<li><strong>[Risk/${r.priority}]</strong> ${esc(r.title)} — Owner: ${r.owner||'—'}</li>`).join('')}${openI.slice(0,5).map(r=>`<li><strong>[Issue/${r.priority}]</strong> ${esc(r.title)} — Owner: ${r.owner||'—'}</li>`).join('')}</ul></div>`:''}
+${blkT.length?`<div class="rpt-sec"><div class="rpt-sec-ttl">🚫 Blocked Tasks (${blkT.length})</div><ul class="rpt-list">${blkT.slice(0,5).map(t=>`<li>${esc(t.name)} — Owner: ${t.owner||'—'}</li>`).join('')}</ul></div>`:''}
+${newT.length?`<div class="rpt-sec"><div class="rpt-sec-ttl">📝 New Tasks Added (${newT.length})</div><ul class="rpt-list">${newT.slice(0,5).map(t=>`<li>${esc(t.name)} — Owner: ${t.owner||'—'} — Due: ${fmtD(t.due)}</li>`).join('')}</ul></div>`:''}
+<div class="rpt-sec"><div class="rpt-sec-ttl">📋 Next Steps</div><p style="font-size:12px;color:var(--text-secondary)">Review all overdue items and update status. Escalate blocked items. Confirm due this week tasks are on track.</p></div>
+<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border-color);font-size:10px;color:var(--text-muted)">Generated by Project Delivery Control Center · ${new Date().toLocaleString('en-GB')}</div>
+</div>`;
+  return rpt
+}
+function rptAudit(){
+  const items=D.audit.slice(0,100);
+  const rows=items.map(a=>`<tr><td>${a.module||'—'}</td><td>${a.action||'—'}</td><td>${esc(a.newValue||a.oldValue||'—').substr(0,50)}</td><td>${a.user||'—'}</td><td>${a.timestamp?a.timestamp.replace('T',' ').substr(0,16):'—'}</td></tr>`).join('');
+  return`<div class="rpt-wrap">${rptActions('audit.csv',null)}<div class="rpt-hdr"><div class="rpt-title">Audit Trail Report</div><div class="rpt-sub">Last 100 entries · ${items.length} shown</div></div><div class="twrap"><table><thead><tr><th>Module</th><th>Action</th><th>Value</th><th>User</th><th>Timestamp</th></tr></thead><tbody>${rows||'<tr><td colspan="5" class="tc tmuted">No audit records</td></tr>'}</tbody></table></div></div>`
+}
+function exportCurrentView(){
+  switch(APP.page){
+    case 'tasks':exportTasks();break;case 'milestones':exportMilestones();break;
+    case 'risks':exportRisks();break;default:toast('Use the Reports module to export','info')
+  }
+}
+
+// ============================================================
+// AUDIT TRAIL PAGE
+// ============================================================
+function renderAudit(){
+  const body=document.getElementById('audit-body');
+  let items=[...D.audit];
+  const fm=document.getElementById('auf-mod')?.value;
+  const fa=document.getElementById('auf-action')?.value;
+  const fse=document.getElementById('auf-search')?.value.toLowerCase();
+  if(fm)items=items.filter(a=>a.module===fm);
+  if(fa)items=items.filter(a=>a.action===fa);
+  if(fse)items=items.filter(a=>(a.newValue+a.oldValue+a.user+a.module).toLowerCase().includes(fse));
+  if(!items.length){body.innerHTML=emptyHTML('🔍','No Audit Records','Changes and actions will be tracked here.');return}
+  const icons={Created:'➕',Updated:'✏️',Deleted:'🗑️',Comment:'💬'};
+  body.innerHTML=items.slice(0,200).map(a=>`<div class="audit-item"><div class="audit-ico">${icons[a.action]||'📝'}</div><div><div class="audit-action">${a.module} — ${a.action}: ${esc((a.newValue||a.oldValue||'').substr(0,60))}</div><div class="audit-meta">by ${esc(a.user||'Unknown')} · ${a.timestamp?a.timestamp.replace('T',' ').substr(0,16):'—'}${a.oldValue&&a.newValue&&a.action==='Updated'?` · "${esc(a.oldValue)}" → "${esc(a.newValue)}"`:''}</div></div></div>`).join('')
+}
+function clearAuditFilters(){['auf-mod','auf-action'].forEach(id=>document.getElementById(id).value='');document.getElementById('auf-search').value='';renderAudit()}
+function exportAudit(){
+  const rows=[['Module','Record ID','Action','Old Value','New Value','User','Timestamp'],...D.audit.map(a=>[a.module||'',a.recordId||'',a.action||'',a.oldValue||'',a.newValue||'',a.user||'',a.timestamp||''])];
+  dlCSV(rows,'audit_trail.csv');toast('Audit exported')
+}
+function confirmClearAudit(){showConfirm('Clear Audit Trail','Delete all audit history? This cannot be undone.',()=>{D.audit=[];sv('audit',D.audit);renderAudit();toast('Audit trail cleared')},'⚠️')}
+
+// ============================================================
+// ADMINISTRATION
+// ============================================================
+function renderAdminPage(){
+  const body=document.getElementById('admin-body');
+  const sections=[
+    {key:'projectStatuses',lbl:'Project Statuses'},
+    {key:'projectHealth',lbl:'Project Health Values'},
+    {key:'phases',lbl:'Project Phases'},
+    {key:'milestoneStatuses',lbl:'Milestone Statuses'},
+    {key:'taskStatuses',lbl:'Task Statuses'},
+    {key:'taskPriorities',lbl:'Task Priorities'},
+    {key:'riskStatuses',lbl:'Risk/Issue Statuses'},
+    {key:'owners',lbl:'Team Members / Owners'},
+    {key:'customers',lbl:'Customers'}
+  ];
+  body.innerHTML=`<div class="g2">${sections.map(s=>`<div class="card mb16"><div class="card-hdr"><div class="card-ttl">${s.lbl}</div><button class="btn btn-s btn-xs" onclick="addAdminItem('${s.key}')">＋ Add</button></div><div id="adm-${s.key}">${renderAdminList(s.key)}</div></div>`).join('')}</div>`
+}
+function renderAdminList(key){
+  const items=CFG[key]||[];
+  if(!items.length)return'<div style="padding:10px;font-size:11px;color:var(--text-muted)">No items</div>';
+  return items.map((item,i)=>`<div class="adm-item"><div class="adm-nm">${esc(item)}</div><div class="flex gap6"><button class="btn btn-s btn-xs" onclick="editAdminItem('${key}',${i})">Edit</button><button class="btn btn-d btn-xs" onclick="delAdminItem('${key}',${i})">Del</button></div></div>`).join('')
+}
+function addAdminItem(key){
+  const val=prompt(`Add new value to "${key}":`);
+  if(!val||!val.trim())return;
+  if(!CFG[key])CFG[key]=[];
+  CFG[key].push(val.trim());sv('config',CFG);
+  const el=document.getElementById('adm-'+key);if(el)el.innerHTML=renderAdminList(key);
+  populateAllFilters();toast('Value added','success')
+}
+function editAdminItem(key,idx){
+  const cur=CFG[key]?.[idx]||'';
+  const val=prompt(`Edit value:`,cur);
+  if(val===null||!val.trim())return;
+  CFG[key][idx]=val.trim();sv('config',CFG);
+  const el=document.getElementById('adm-'+key);if(el)el.innerHTML=renderAdminList(key);
+  populateAllFilters();toast('Value updated','success')
+}
+function delAdminItem(key,idx){
+  const val=CFG[key]?.[idx];
+  if(!confirm(`Delete "${val}"? This may affect existing records.`))return;
+  CFG[key].splice(idx,1);sv('config',CFG);
+  const el=document.getElementById('adm-'+key);if(el)el.innerHTML=renderAdminList(key);
+  populateAllFilters();toast('Value removed')
+}
+function restoreDefaults(){
+  if(!confirm('Restore all configuration to defaults? Custom values will be lost.'))return;
+  CFG=JSON.parse(JSON.stringify(DEF_CFG));sv('config',CFG);renderAdminPage();populateAllFilters();toast('Defaults restored','success')
+}
+
+// ============================================================
+// DATA MANAGEMENT
+// ============================================================
+function renderDataPage(){
+  document.getElementById('data-body').innerHTML=`
+<div class="g2">
+  <div>
+    <div class="card mb16"><div class="card-hdr"><div class="card-ttl">💾 Backup & Restore</div></div><div class="card-body">
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px">Export a complete JSON backup of all data or restore from a previous backup.</p>
+      <div class="fg"><button class="btn btn-p" style="width:100%" onclick="exportFullBackup()">⬇ Export Full Backup (JSON)</button></div>
+      <div class="fg"><label>Restore from File</label><input type="file" id="bk-file" accept=".json" style="padding:4px;font-size:11px;width:100%"></div>
+      <button class="btn btn-s" style="width:100%" onclick="importBackup()">⬆ Restore Backup</button>
+    </div></div>
+    <div class="card mb16"><div class="card-hdr"><div class="card-ttl">📥 Import from CSV</div></div><div class="card-body">
+      <div class="fg"><label>Import Tasks (CSV)</label><input type="file" id="imp-tasks-file" accept=".csv" style="padding:4px;font-size:11px;width:100%"></div>
+      <button class="btn btn-s mb8" style="width:100%" onclick="importTasksCSV()">Import Tasks</button>
+      <div class="fg"><label>Import Milestones (CSV)</label><input type="file" id="imp-ms-file" accept=".csv" style="padding:4px;font-size:11px;width:100%"></div>
+      <button class="btn btn-s" style="width:100%" onclick="importMsCSV()">Import Milestones</button>
+    </div></div>
+  </div>
+  <div>
+    <div class="card mb16"><div class="card-hdr"><div class="card-ttl">⬇ Export Data</div></div><div class="card-body">
+      <div class="fg"><button class="btn btn-s" style="width:100%;margin-bottom:8px" onclick="exportTasks()">Export Tasks (CSV)</button></div>
+      <div class="fg"><button class="btn btn-s" style="width:100%;margin-bottom:8px" onclick="exportMilestones()">Export Milestones (CSV)</button></div>
+      <div class="fg"><button class="btn btn-s" style="width:100%;margin-bottom:8px" onclick="exportRisks()">Export Risks & Issues (CSV)</button></div>
+      <div class="fg"><button class="btn btn-s" style="width:100%" onclick="exportAudit()">Export Audit Trail (CSV)</button></div>
+    </div></div>
+    <div class="card mb16"><div class="card-hdr"><div class="card-ttl">🎲 Demo Data</div></div><div class="card-body">
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">Load sample project data to explore the platform.</p>
+      <div class="fg"><button class="btn btn-ok" style="width:100%;margin-bottom:8px" onclick="loadDemoData()">Load Demo Data</button></div>
+      <div style="font-size:11px;color:var(--text-muted)">Creates a sample Oracle implementation project with phases, milestones, tasks, and risks.</div>
+    </div></div>
+    <div class="card"><div class="card-hdr"><div class="card-ttl" style="color:var(--red)">⚠️ Danger Zone</div></div><div class="card-body">
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">Permanently delete all data. This cannot be undone.</p>
+      <button class="btn btn-d" style="width:100%" onclick="confirmClearAll()">🗑️ Clear All Data</button>
+    </div></div>
+  </div>
+</div>`
+}
+function showBackupModal(){openModal('bk-modal')}
+function exportFullBackup(){
+  const backup={version:'1.0',exportedAt:new Date().toISOString(),projects:D.projects,milestones:D.milestones,tasks:D.tasks,risks:D.risks,audit:D.audit,config:CFG,savedViews:ld('views')||[],user:APP.curUser,theme:document.body.getAttribute('data-theme')};
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pdcc_backup_'+new Date().toISOString().substr(0,10)+'.json';a.click();
+  toast('Backup exported','success')
+}
+function importBackup(){
+  const file=(document.getElementById('bk-file-modal')||document.getElementById('bk-file'))?.files?.[0];
+  if(!file){toast('Select a backup file first','warning');return}
+  const reader=new FileReader();
+  reader.onload=e=>{try{
+    const bk=JSON.parse(e.target.result);
+    if(!bk.projects&&!bk.tasks){toast('Invalid backup file','error');return}
+    D.projects=bk.projects||[];D.milestones=bk.milestones||[];D.tasks=bk.tasks||[];D.risks=bk.risks||[];D.audit=bk.audit||[];
+    if(bk.config)CFG=bk.config;
+    if(bk.savedViews)sv('views',bk.savedViews);
+    if(bk.user){APP.curUser=bk.user;sv('user',APP.curUser)}
+    if(bk.theme){document.body.setAttribute('data-theme',bk.theme);sv('theme',bk.theme)}
+    sv('projects',D.projects);sv('milestones',D.milestones);sv('tasks',D.tasks);sv('risks',D.risks);sv('audit',D.audit);sv('config',CFG);
+    populateProjSel();populateAllFilters();renderSavedViews();updateUserUI();renderDash();updateBadges();updateSbar();
+    toast(`Restored: ${D.projects.length} projects, ${D.tasks.length} tasks, ${D.milestones.length} milestones`,'success')
+  }catch(err){toast('Restore failed: '+err.message,'error')}};
+  reader.readAsText(file)
+}
+function importTasksCSV(){
+  const file=document.getElementById('imp-tasks-file')?.files?.[0];
+  if(!file){toast('Select a CSV file','warning');return}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const lines=e.target.result.split('\n').filter(l=>l.trim());
+    if(lines.length<2){toast('CSV has no data rows','warning');return}
+    const hdr=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/[^a-z]/g,''));
+    let cnt=0;
+    lines.slice(1).forEach(line=>{
+      const vals=line.split(',').map(v=>v.trim().replace(/^"|"$/g,''));
+      const get=(k)=>vals[hdr.indexOf(k)]||'';
+      const name=get('name')||get('taskname');if(!name)return;
+      const prjName=get('project')||get('projectname');
+      const prj=D.projects.find(p=>p.name.toLowerCase()===prjName.toLowerCase());
+      const now=new Date().toISOString();
+      D.tasks.push({id:gid(),name,project:prj?prj.id:'',owner:get('owner'),priority:get('priority')||'Medium',status:get('status')||'Not Started',due:get('due')||get('duedate'),pct:get('pct')||get('completion')||'0',health:'Green',created:now,updated:now});
+      cnt++
+    });
+    sv('tasks',D.tasks);populateTkFilters();renderDash();updateBadges();updateSbar();toast(`Imported ${cnt} tasks`,'success')
+  };reader.readAsText(file)
+}
+function importMsCSV(){
+  const file=document.getElementById('imp-ms-file')?.files?.[0];
+  if(!file){toast('Select a CSV file','warning');return}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const lines=e.target.result.split('\n').filter(l=>l.trim());
+    if(lines.length<2){toast('CSV has no data','warning');return}
+    const hdr=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/[^a-z]/g,''));
+    let cnt=0;
+    lines.slice(1).forEach(line=>{
+      const vals=line.split(',').map(v=>v.trim().replace(/^"|"$/g,''));
+      const get=(k)=>vals[hdr.indexOf(k)]||'';
+      const name=get('name')||get('milestonename');if(!name)return;
+      const prjName=get('project');const prj=D.projects.find(p=>p.name.toLowerCase()===(prjName||'').toLowerCase());
+      const now=new Date().toISOString();
+      D.milestones.push({id:gid(),name,project:prj?prj.id:'',owner:get('owner'),status:get('status')||'Not Started',health:'Green',due:get('due')||get('duedate'),pct:'0',created:now,updated:now});
+      cnt++
+    });
+    sv('milestones',D.milestones);populateMsFilters();renderDash();updateBadges();toast(`Imported ${cnt} milestones`,'success')
+  };reader.readAsText(file)
+}
+function confirmClearAll(){showConfirm('Clear All Data','This will permanently delete ALL projects, tasks, milestones, risks, and audit data. This cannot be undone.',()=>{D={projects:[],milestones:[],tasks:[],risks:[],audit:[]};Object.values(SK).forEach(k=>rmStore(k));CFG=JSON.parse(JSON.stringify(DEF_CFG));sv('config',CFG);populateProjSel();populateAllFilters();renderSavedViews();renderDash();updateBadges();updateSbar();renderAdminPage();toast('All data cleared','success')},'🗑️')}
+
+// ============================================================
+// DEMO DATA
+// ============================================================
+function loadDemoData(){
+  if(!confirm('Load demo data? This will ADD sample data to your current data.'))return;
+  const now=new Date().toISOString();const td=tod();
+  const p={id:gid(),name:'Palm Sports Oracle Implementation',code:'PALM-001',customer:'Palm Sports LLC',manager:'Alice Chen',sponsor:'David Lee',phase:'UAT',start:'2025-01-06',end:'2025-08-29',status:'Active',health:'Amber',deliveryTeam:'Alice Chen, Bob Smith, Carol White',customerTeam:'Frank Miller, Emma Brown',description:'Full Oracle Cloud ERP implementation for Palm Sports LLC including CPQ, Finance, and Supply Chain modules.',scope:'Oracle CPQ, Oracle Financials, Oracle SCM. Go-live targeted Q3 2025.',created:now,updated:now};
+  D.projects.push(p);const pid=p.id;
+  const phases2=['UAT','SIT','Go-Live Preparation'];
+  const msData=[
+    {name:'Complete UAT Phase Sign-off',phase:'UAT',owner:'Alice Chen',due:'2025-06-30',status:'In Progress',health:'Amber',pct:'65'},
+    {name:'Fix CPQ Quote Printout Issues',phase:'UAT',owner:'Bob Smith',due:'2025-06-15',status:'In Progress',health:'Green',pct:'80'},
+    {name:'Finance Module UAT Completion',phase:'UAT',owner:'Carol White',due:'2025-06-20',status:'In Progress',health:'Green',pct:'70'},
+    {name:'SIT Exit Sign-off',phase:'SIT',owner:'Alice Chen',due:'2025-05-31',status:'Completed',health:'Green',pct:'100'},
+    {name:'Go-Live Readiness Review',phase:'Go-Live Preparation',owner:'Alice Chen',due:'2025-07-31',status:'Not Started',health:'Green',pct:'0'},
+    {name:'Data Migration Validation',phase:'UAT',owner:'Bob Smith',due:'2025-06-25',status:'At Risk',health:'Red',pct:'40'}
+  ];
+  const mids=[];
+  msData.forEach(m=>{const id=gid();mids.push(id);D.milestones.push({id,project:pid,...m,start:'2025-05-01',created:now,updated:now})});
+  const taskData=[
+    {name:'Update quotation layout for CPQ',phase:'UAT',milestone:mids[1],owner:'Bob Smith',priority:'High',status:'In Progress',due:'2025-06-10',pct:'75',description:'Fix layout issues in CPQ quote printout template'},
+    {name:'Validate pricing formulas in CPQ',phase:'UAT',milestone:mids[1],owner:'Bob Smith',priority:'Critical',status:'In Progress',due:'2025-06-12',pct:'60'},
+    {name:'CPQ customer review session',phase:'UAT',milestone:mids[1],owner:'Alice Chen',priority:'High',status:'Not Started',due:'2025-06-14',pct:'0'},
+    {name:'CPQ sign-off from customer',phase:'UAT',milestone:mids[0],owner:'Alice Chen',priority:'Critical',status:'Not Started',due:'2025-06-29',pct:'0'},
+    {name:'AP Invoice processing UAT',phase:'UAT',milestone:mids[2],owner:'Carol White',priority:'High',status:'Done',due:'2025-06-05',pct:'100',actualCompletion:'2025-06-04'},
+    {name:'GL Chart of Accounts validation',phase:'UAT',milestone:mids[2],owner:'Carol White',priority:'Medium',status:'In Progress',due:'2025-06-18',pct:'55'},
+    {name:'Cash Management UAT',phase:'UAT',milestone:mids[2],owner:'Carol White',priority:'Medium',status:'Not Started',due:'2025-06-20',pct:'0'},
+    {name:'Data migration dry run #2',phase:'UAT',milestone:mids[5],owner:'Bob Smith',priority:'Critical',status:'Blocked',due:'2025-06-08',pct:'30',riskFlag:true,description:'Blocked pending source system data extract from customer ERP'},
+    {name:'Cutover plan documentation',phase:'Go-Live Preparation',milestone:mids[4],owner:'Alice Chen',priority:'High',status:'Not Started',due:'2025-07-15',pct:'0'},
+    {name:'Training material preparation',phase:'UAT',owner:'Carol White',priority:'Medium',status:'In Progress',due:'2025-06-22',pct:'45'},
+    {name:'Performance test execution',phase:'SIT',owner:'Bob Smith',priority:'High',status:'Done',due:'2025-05-28',pct:'100',actualCompletion:'2025-05-27'},
+    {name:'Security role assignment review',phase:'UAT',owner:'Alice Chen',priority:'High',status:'Not Started',due:'2025-06-25',pct:'0'}
+  ];
+  taskData.forEach(t=>D.tasks.push({id:gid(),project:pid,health:'Green',created:now,updated:now,...t}));
+  const riskData=[
+    {title:'Data migration source extract delay',type:'Risk',owner:'Bob Smith',priority:'High',impact:'High',probability:'High',status:'Open',due:'2025-06-10',description:'Customer ERP data extract is delayed by 2 weeks. This may push migration testing beyond planned dates.',mitigation:'Engage customer IT team directly. Schedule daily sync. Prepare mock data for parallel testing.'},
+    {title:'CPQ customisation scope creep',type:'Risk',owner:'Alice Chen',priority:'High',impact:'High',probability:'Medium',status:'In Progress',due:'2025-06-20',description:'Customer requesting additional CPQ customisations beyond contracted scope.',mitigation:'Formal change request process initiated. Change control board review scheduled.'},
+    {title:'GL period close not tested',type:'Issue',owner:'Carol White',priority:'High',impact:'High',probability:'High',status:'Open',due:'2025-06-15',description:'Month-end close process was not included in UAT test scripts. Critical gap identified.',mitigation:'Emergency test cases being created. Extended UAT window requested.'},
+    {title:'UAT resource availability — customer side',type:'Risk',owner:'Alice Chen',priority:'Medium',impact:'Medium',probability:'Medium',status:'Open',due:'2025-06-30',description:'Customer UAT team availability at risk due to internal restructuring.',mitigation:'Escalated to sponsor David Lee. Backup testers being identified.'},
+    {title:'Oracle patch required before go-live',type:'Dependency',owner:'Bob Smith',priority:'Medium',impact:'Medium',probability:'Low',status:'Open',due:'2025-07-15',description:'Oracle mandatory security patch must be applied before go-live. Requires downtime window.'},
+    {title:'Approve go-live date extension',type:'Decision',owner:'Alice Chen',priority:'High',impact:'High',probability:'High',status:'Open',due:'2025-06-25',description:'Based on current UAT progress, recommendation to extend go-live by 3 weeks to 2025-09-19.'}
+  ];
+  riskData.forEach(r=>D.risks.push({id:gid(),project:pid,phase:'UAT',created:now,updated:now,...r}));
+  // Audit entries
+  addAudit('Project',pid,'Created',null,p.name,'Demo Loader');
+  sv('projects',D.projects);sv('milestones',D.milestones);sv('tasks',D.tasks);sv('risks',D.risks);
+  populateProjSel();populateAllFilters();renderSavedViews();
+  document.getElementById('projSel').value=pid;APP.activePrj=pid;
+  document.getElementById('dash-sub').textContent='Project: '+p.name;
+  renderDash();updateBadges();updateSbar();
+  toast('Demo data loaded: Palm Sports Oracle Implementation','success');
+  document.getElementById('umenu').classList.add('hidden')
+}
+
+// ============================================================
+// CSV UTILITY
+// ============================================================
+function dlCSV(rows,filename){
+  const content=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([content],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click()
+}
+
+// ============================================================
+// START
+// ============================================================
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
